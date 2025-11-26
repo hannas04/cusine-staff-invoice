@@ -370,7 +370,7 @@ function generatePDF(){
 
     html2pdf().set(opt).from(el).save()
         .then(() => { /* success */ })
-        .catch(err => { console.error(err); alert('PDF generation failed. Please try again.'); });
+        .catch(err => { console.error(err); alert('PDF generation failed. Pls try again.'); });
 }
 
 init();
