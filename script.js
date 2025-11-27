@@ -1,4 +1,3 @@
-
 const m = [
   // CANAPÉS - N2,000 per item
   { n: "Veggies Roll with Sweet Chilli Dip", p: 2000, c: "Canapés" },
@@ -349,29 +348,34 @@ function updateCalculations(){
     document.getElementById('grand-total').textContent = '₦' + grandTotal.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function generatePDF(){
-    const el = document.getElementById('invoice-to-print');
-    if(!el || el.innerHTML.trim()===''){
-        alert('No invoice to export. Please generate the invoice first.');
+function generatePDF() {
+    const element = document.getElementById('invoice-to-print');
+    
+    if (!element || element.innerHTML.trim() === '') {
+        alert('Please generate an invoice first');
         return;
     }
 
-    updateCalculations();
-
-    const filename = 'Invoice-' + (window.lastInvoiceId || Date.now()) + '.pdf';
-    const opt = {
-        margin:       5,
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 4, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
+    const options = {
+        margin: [10, 10, 10, 10],
+        filename: 'Cuisine_Invoice_' + new Date().toISOString().split('T')[0] + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 4,
+            useCORS: true,
+            allowTaint: true,
+            logging: false
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
-    html2pdf().set(opt).from(el).save()
-        .then(() => { /* success */ })
-        .catch(err => { console.error(err); alert('PDF generation failed. Pls try again.'); });
+    html2pdf().set(options).from(element).save();
 }
 
 init();
-    
