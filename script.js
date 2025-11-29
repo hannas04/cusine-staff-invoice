@@ -1,3 +1,10 @@
+/*
+ Robust script for invoice generation — matches IDs in index.html.
+ - Uses #transport-fee (as in index.html)
+ - Provides updateCalculations() per spec (20% service, VAT = 7.5% of service)
+ - Ensures #invoice-preview gets "active" class so preview is visible
+ - PDF export uses html2canvas scale:4
+*/
 
 const m = [
   // CANAPÉS - N2,000 per item
@@ -55,13 +62,13 @@ const m = [
   { n: "Potato Wedges with Spicy Chicken Wings", p: 3500, c: "Canapés" },
   { n: "Ewa Agoyin with Bread & Sauce", p: 3500, c: "Canapés" },
 
-  // BREAKFAST MENU (per guest) — expanded descriptions
+  // BREAKFAST MENU
   { n: "Breakfast - Buffet Style (per guest): Includes Tea (Green/Black/Flavored), Coffee, Juice, Mini Snacks (Meat Pie, Sausage Roll, Doughnut), Bread Roll, Cup Cakes, Sandwiches, Pancakes, Grilled Sausages, Spicy Chicken Wings, Fruit Platter, Tapioca, Boiled Yam, Plantain, Sweet Potatoes, Titus Sauce, Various Egg Preparations, Macaroni, Ewa Agoyin, Baked Beans, Sliced Bread, Irish Potato", p: 15000, c: "Breakfast" },
   { n: "Breakfast - Menu 2 (per guest): Includes Tea Station, Slice Bread, Sausage, Baked Beans, Scrambled Eggs", p: 12000, c: "Breakfast" },
   { n: "Breakfast - Menu 3 (per guest): Includes 2 Snacks, 1 Protein, Tea Station, Boiled Plantain, Boiled Yam, Fish Stew, Sauteed Potatoes, Nigerian Egg Sauce", p: 6000, c: "Breakfast" },
   { n: "Breakfast - Menu 4 (per guest): Executive Snacks (Mini Croissant, Mini Pain Au Chocolat, Muffins, Mini Sliders, Waffles, Puff Pastry Meat Pie, Puff Pastry Sausage, Sandwiches), 1 Protein, Juice Station", p: 12000, c: "Breakfast" },
 
-  // SMALL CHOPS (per guest) — expanded option contents
+  // SMALL CHOPS
   { n: "Small Chops - Option 1: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas", p: 2500, c: "Small Chops" },
   { n: "Small Chops - Option 2: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Corndog", p: 2700, c: "Small Chops" },
   { n: "Small Chops - Option 3: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Peppered Gizzard", p: 3000, c: "Small Chops" },
@@ -79,7 +86,7 @@ const m = [
   { n: "Small Chops - Option 15: 1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, Puff Puff & Skewers", p: 8100, c: "Small Chops" },
   { n: "Small Chops - Option 16: 1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, 1 Fish in Batter, Puff Puff & Skewers", p: 9000, c: "Small Chops" },
 
-  // GRILL HOUSE (per serving/combo)
+  // GRILL HOUSE
   { n: "Grilled Whole Fish with sides (yam, plantain & potatoes)", p: 9000, c: "Grill House" },
   { n: "Titus fish & Bole", p: 4500, c: "Grill House" },
   { n: "Mini Grilled Catfish with sides (yam, plantain & potatoes)", p: 4500, c: "Grill House" },
@@ -95,7 +102,7 @@ const m = [
   { n: "Jumbo Grilled Prawn Combo (medium)", p: 7500, c: "Grill House" },
   { n: "Jumbo Grilled Prawn Combo (large)", p: 9000, c: "Grill House" },
 
-  // MINI FOOD (per serving)
+  // MINI FOOD
   { n: "Jambalaya Rice served with chicken skewers / chicken lollipop", p: 4500, c: "Mini Food" },
   { n: "Suya Spiced Alfredo with Prawns", p: 4500, c: "Mini Food" },
   { n: "Shrimps Fried Rice served with crispy fish & veggies", p: 4500, c: "Mini Food" },
@@ -106,15 +113,13 @@ const m = [
   { n: "Crispy Potato Wedges with Bbq Chicken", p: 4500, c: "Mini Food" },
   { n: "Stir-Fried Spaghetti served with spicy chicken", p: 4500, c: "Mini Food" },
 
-  // AFTER PARTY EATS - Shawarma
+  // AFTER PARTY EATS
   { n: "Full Beef Sausage Shawarma", p: 3000, c: "After Party" },
   { n: "Mini Beef Sausage Shawarma", p: 1500, c: "After Party" },
   { n: "Full Chicken Sausage Shawarma", p: 3000, c: "After Party" },
   { n: "Mini Chicken Sausage Shawarma", p: 1500, c: "After Party" },
   { n: "Full Mixed Special (beef & Chicken) Shawarma", p: 3500, c: "After Party" },
   { n: "Mini Mixed Special (beef & Chicken) Shawarma", p: 1800, c: "After Party" },
-
-  // AFTER PARTY EATS - Burgers / Hotdogs / Combos / Additional
   { n: "Regular Beef Burger", p: 4500, c: "After Party" },
   { n: "Mini Beef Burger", p: 3500, c: "After Party" },
   { n: "Regular Chicken Burger", p: 4500, c: "After Party" },
@@ -139,7 +144,7 @@ const m = [
   { n: "Tapioca Served with Fantail Prawn", p: 5500, c: "After Party" },
   { n: "Tapioca Served with Mini Akara Sliders", p: 5500, c: "After Party" },
 
-  // PLATTER MENU (per platter)
+  // PLATTER MENU
   { n: "Nibbles Platter", p: 30000, c: "Platter" },
   { n: "Party Platter", p: 40000, c: "Platter" },
   { n: "Treaty Platter", p: 50000, c: "Platter" },
@@ -154,226 +159,406 @@ const m = [
   { n: "Fantastique Platter", p: 100000, c: "Platter" },
   { n: "ORI BOX", p: 100000, c: "Platter" }
 ];
-let s={},f='All',serviceChargeRate=15;
 
-function init(){
-    const cs=['All',...new Set(m.map(i=>i.c))];
-    document.getElementById('category-filter').innerHTML = cs.map(c=>
-        `<button class="filter-btn ${c==='All'?'active':''}" data-cat="${c}" onclick="filterCategory('${c}', this)">${c}</button>`
-    ).join('');
-    renderMenuItems(document.getElementById('search-input').value || '');
-    document.getElementById('search-input').addEventListener('input',e=>renderMenuItems(e.target.value));
+let s = {}; // selected items { name: {p, q} }
+const SERVICE_RATE_PERCENT = 20; // per spec
+
+function init() {
+  initializeInvoiceCode();
+  renderCategoryFilter();  // Add this line
+  renderMenuItems();
+  const search = document.getElementById('search-input');
+  if (search) search.addEventListener('input', e => renderMenuItems(e.target.value));
+  renderSelectedItems();
+}
+function generateInvoiceCode(){
+  const t = Date.now().toString(36).toUpperCase();
+  const r = Math.random().toString(36).slice(2,7).toUpperCase();
+  return `INV-${t}${r}`;
+}
+function initializeInvoiceCode(){
+  const el = document.getElementById('invoice-code');
+  if (el && !el.value) el.value = generateInvoiceCode();
 }
 
-function updateServiceChargeRate(){
-    const locationType = document.getElementById('location-type').value;
-    serviceChargeRate = locationType === 'outside' ? 20 : 15;
+/* Menu rendering & selection */
+function renderMenuItems(filter = '') {
+  const grid = document.getElementById('menu-grid');
+  if (!grid) return;
+  const items = m.filter(i => !filter || i.n.toLowerCase().includes(filter.toLowerCase()) || i.c.toLowerCase().includes(filter.toLowerCase()));
+  grid.innerHTML = items.map(it => {
+    const sel = s[it.n] ? 'selected' : '';
+    return `<div class="menu-item-card ${sel}" onclick="toggleItem('${escapeJS(it.n)}', ${it.p})">
+      <div class="item-name">${it.n}</div>
+      <div class="item-price">₦${it.p.toLocaleString()}</div>
+    </div>`;
+  }).join('') || '<div style="padding:12px;color:#999">No items found</div>';
 }
-
-function filterCategory(c, btnEl){
-    f = c;
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    if(btnEl && btnEl.classList) btnEl.classList.add('active');
-    else {
-        const found = document.querySelector(`.filter-btn[data-cat="${c}"]`);
-        if(found) found.classList.add('active');
-    }
-    renderMenuItems(document.getElementById('search-input').value || '');
+function toggleItem(name, price) {
+  if (s[name]) delete s[name];
+  else s[name] = { p: price, q: 1 };
+  renderMenuItems(document.getElementById('search-input')?.value || '');
+  renderSelectedItems();
 }
-
-function renderMenuItems(t=''){
-    const g=document.getElementById('menu-grid');
-    let items = f==='All' ? m : m.filter(i=>i.c===f);
-    if(t) items = items.filter(i=>i.n.toLowerCase().includes(t.toLowerCase()) || i.c.toLowerCase().includes(t.toLowerCase()));
-    if(items.length===0){
-        g.innerHTML = '<div class="empty-state"><i class="fas fa-search" style="font-size:40px;color:#ccc;margin-bottom:8px"></i><p>No items found</p></div>';
-        return;
-    }
-    g.innerHTML = items.map(i=>`<div class="menu-item-card ${s[i.n]?'selected':''}" onclick="toggleItem('${i.n.replace(/'/g,"\\'")}',${i.p})"><div class="item-category">${i.c}</div><div class="item-name">${i.n}</div><div class="item-price">₦${i.p.toLocaleString()}</div></div>`).join('');
-}
-
-function toggleItem(n,p){ s[n] ? delete s[n] : s[n] = {p,q:1}; renderMenuItems(document.getElementById('search-input').value || ''); renderSelectedItems(); }
-
-function addCustomMenu(){
-    const name = document.getElementById('custom-menu-name').value.trim();
-    const price = parseFloat(document.getElementById('custom-menu-price').value) || 0;
-    const qty = parseInt(document.getElementById('custom-menu-qty').value) || 1;
-    
-    if(!name){ alert('Please enter a menu name'); return; }
-    if(price <= 0){ alert('Please enter a valid price'); return; }
-    
-    s[name] = {p: price, q: qty};
-    
-    document.getElementById('custom-menu-name').value = '';
-    document.getElementById('custom-menu-price').value = '0';
-    document.getElementById('custom-menu-qty').value = '1';
-    
-    renderSelectedItems();
-}
+function escapeJS(str){ return String(str).replace(/'/g,"\\'").replace(/"/g,'\\"'); }
 
 function renderSelectedItems(){
-    const c=document.getElementById('selected-items-container'), d=document.getElementById('selected-items'), items=Object.keys(s);
-    if(items.length===0){ c.style.display='none'; return; }
-    c.style.display='block';
-    d.innerHTML = items.map(n=>`<div class="selected-item"><div class="selected-item-info"><strong>${n}</strong><br><small style="color:#dc2626">₦<input type="number" style="width:80px;padding:2px;border:1px solid #dc2626;border-radius:3px;font-size:11px;font-weight:600;color:#dc2626" value="${s[n].p}" onchange="updatePrice('${n.replace(/'/g,"\\'")}',this.value)" min="0"></small></div><div style="display:flex;align-items:center;gap:8px"><label style="margin:0;font-size:11px">Qty:</label><input type="number" class="qty-input" value="${s[n].q}" min="1" onchange="updateQty('${n.replace(/'/g,"\\'")}',this.value)"><button class="remove-btn" onclick="removeItem('${n.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></div></div>`).join('');
-}
-
-function updatePrice(n,p){
-    s[n].p = parseFloat(p) || 0;
-    renderSelectedItems();
-}
-
-function updateQty(n,q){ s[n].q = parseInt(q) || 1; renderSelectedItems(); }
-
-function removeItem(n){ delete s[n]; renderMenuItems(document.getElementById('search-input').value || ''); renderSelectedItems(); }
-
-function generateInvoice(){
-    const clientName = document.getElementById('client-name').value.trim();
-    const d=document.getElementById('event-date').value,g=document.getElementById('guests').value,l=document.getElementById('location').value,a=document.getElementById('address').value;
-    if(!clientName){ alert('Please enter client name!'); return; }
-    if(!d||!g||!l||!a){ alert('Please fill in all event details!'); return; }
-    const items = Object.keys(s);
-    if(items.length===0){ alert('Please select at least one menu item!'); return; }
-    
-    let sub=0;
-    const rows = items.map(n=>{ const i=s[n], tot=i.p*i.q; sub+=tot; return `<tr class="invoice-item"><td>${n}</td><td style="text-align:right">₦${i.p.toLocaleString()}</td><td style="text-align:center">${i.q}</td><td style="text-align:right">₦${tot.toLocaleString()}</td></tr>` }).join('');
-    
-    const t=parseFloat(document.getElementById('transport-fee').value)||0;
-    const sc = sub * (serviceChargeRate / 100);
-    const vat = sc * 0.075;
-    const gt = sub + sc + vat + t;
-    
-    const inv='INV-'+Date.now(), dt=new Date().toLocaleDateString(), dueDate=new Date(Date.now()+30*24*60*60*1000).toLocaleDateString();
-    
-    document.getElementById('invoice-to-print').innerHTML =
-    `<div class="invoice-header">
-        <div class="invoice-left">
-            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px">
-                <img src="cuisine-logo.jpg" alt="Cuisine Fantastique" class="invoice-logo">
-                <div class="invoice-header-details">
-                    <strong>Cuisine Fantastique</strong><br>
-                    Lekki Peninsula Scheme 2<br>
-                    Road 10b, Femi Olugbile street, Lagos<br>
-                    <strong>Phone:</strong> 08158894642<br>
-                    <strong>Email:</strong> cuisinefantastique1@gmail.com
-                </div>
-            </div>
-        </div>
-        <div class="invoice-title">${new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-    </div>
-    
-    <div class="invoice-details">
-        <div class="detail-box">
-            <h3>Bill To</h3>
-            <p><strong>${clientName}</strong></p>
-        </div>
-        <div class="detail-box">
-            <h3>Invoice Details</h3>
-            <p><strong>Invoice #:</strong> ${inv}</p>
-            <p><strong>Invoice Date:</strong> ${dt}</p>
-            <p><strong>Due Date:</strong> ${dueDate}</p>
-            <p><strong>Balance Due:</strong> ₦${gt.toLocaleString()}</p>
-        </div>
-    </div>
-    
-    <table class="items-table">
-        <thead>
-            <tr><th>Description</th><th style="text-align:right">Rate</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-    </table>
-    
-    <div class="invoice-summary-block">
-        <div class="summary-row">
-            <span class="summary-label">Subtotal:</span>
-            <span class="summary-value" id="subtotal">₦${sub.toLocaleString()}</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">Service Charge (${serviceChargeRate}%):</span>
-            <span class="summary-value" id="service-charge">₦${sc.toLocaleString()}</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">Transportation Fee:</span>
-            <span class="summary-value" id="transport-amount">₦${t.toLocaleString()}</span>
-        </div>
-        <div class="summary-row" style="font-size:9px;color:#666;border-bottom:none;padding:4px 0">
-            <span class="summary-label" style="color:#666"><em>VAT (7.5% on Service Charge):</em></span>
-            <span class="summary-value" id="vat-amount" style="color:#666">₦${vat.toLocaleString()}</span>
-        </div>
-        <div class="summary-row grand-total">
-            <span class="summary-label">GRAND TOTAL:</span>
-            <span class="summary-value" id="grand-total">₦${gt.toLocaleString()}</span>
-        </div>
-    </div>
-    
-    <div class="payment-block">
-        <h3>Payment Instructions</h3>
-        <div class="bank-details">
-            <strong>Bank Transfer:</strong><br>
-            Account Number: 2094187584<br>
-            Account Name: Cuisine Fantastique<br>
-            Bank Name: UBA
-        </div>
-        <h3 style="margin-top:10px">Important Terms & Conditions</h3>
-        <ul>
-            <li>A 100% non-refundable payment is required as commitment/booking fee</li>
-            <li>All payments are non-refundable</li>
-            <li>Kindly check if we are still available on your chosen date before paying a deposit</li>
-            <li>In the case of a cancellation, all payments made are only transferable and cannot be refunded</li>
-            <li>Please NOTE that the invoice is only valid for one month and prices can change based on market price</li>
-        </ul>
+  const container = document.getElementById('selected-items-container');
+  const target = document.getElementById('selected-items');
+  if (!container || !target) return;
+  const keys = Object.keys(s);
+  if (keys.length === 0) { container.style.display = 'none'; target.innerHTML = ''; return; }
+  container.style.display = 'block';
+  target.innerHTML = keys.map(k => {
+    const it = s[k];
+    return `<div class="selected-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f1f1">
+      <div>
+        <strong>${k}</strong><br>
+        <small style="color:#666">₦<input type="number" value="${it.p}" min="0" style="width:90px;padding:4px;border:1px solid #ddd;border-radius:4px" onchange="updatePrice('${escapeJS(k)}', this.value)"></small>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:13px">Qty</label>
+        <input type="number" class="qty-input" value="${it.q}" min="1" onchange="updateQty('${escapeJS(k)}', this.value)">
+        <button class="remove-btn" onclick="removeItem('${escapeJS(k)}')"><i class="fas fa-trash"></i></button>
+      </div>
+      <div style="font-weight:700;color:#dc2626">₦${(it.p * it.q).toLocaleString()}</div>
     </div>`;
-    
-    window.lastInvoiceId = inv.replace(/\s+/g,'');
-    document.getElementById('invoice-preview').classList.add('active');
-    document.getElementById('invoice-preview').scrollIntoView({behavior:'smooth'});
+  }).join('');
 }
 
-function updateCalculations(){
-    let subtotalAmount = 0;
-    document.querySelectorAll('.invoice-item').forEach(row => {
-        const rate = parseFloat(row.cells[1].textContent.replace('₦','').replace(/,/g,'')) || 0;
-        const qty = parseInt(row.cells[2].textContent) || 0;
-        subtotalAmount += rate * qty;
+/* Selected item actions */
+function addCustomMenu(){
+  const name = (document.getElementById('custom-menu-name')?.value || '').trim();
+  const price = parseFloat(document.getElementById('custom-menu-price')?.value) || 0;
+  const qty = parseInt(document.getElementById('custom-menu-qty')?.value) || 1;
+  if (!name) return showMessage('Enter menu name','error');
+  if (price <= 0) return showMessage('Enter valid price','error');
+  s[name] = { p: price, q: qty };
+  document.getElementById('custom-menu-name').value = '';
+  document.getElementById('custom-menu-price').value = '0';
+  document.getElementById('custom-menu-qty').value = '1';
+  renderSelectedItems();
+  showMessage(`Custom item added`,'success');
+}
+function updatePrice(name, p){ if (!s[name]) return; s[name].p = parseFloat(p) || 0; renderSelectedItems(); }
+function updateQty(name, q){ if (!s[name]) return; s[name].q = Math.max(1, parseInt(q) || 1); renderSelectedItems(); }
+function removeItem(name){ delete s[name]; renderSelectedItems(); renderMenuItems(document.getElementById('search-input')?.value || ''); }
+
+/* Messages */
+function showMessage(msg, type='success'){
+  const d = document.createElement('div');
+  d.className = type === 'success' ? 'success-message' : 'error-message';
+  d.textContent = msg;
+  const container = document.querySelector('.container') || document.body;
+  container.parentNode.insertBefore(d, container);
+  setTimeout(()=> d.remove(), 5000);
+}
+
+/* Calculations per spec */
+function updateCalculations(subtotal){
+  const serviceCharge = subtotal * (SERVICE_RATE_PERCENT / 100);
+  const vat = serviceCharge * 0.075;
+  const total = subtotal + serviceCharge + vat;
+  return { serviceCharge, vat, total };
+}
+
+/* Invoice generation (main) */
+function generateInvoice(){
+  try {
+    // Gather and validate
+    const clientName = (document.getElementById('client-name')?.value || '').trim();
+    const eventDateRaw = document.getElementById('event-date')?.value;
+    const eventDateFormatted = eventDateRaw ? new Date(eventDateRaw).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase() : '';
+    const guests = document.getElementById('guests')?.value;
+    const locationType = document.getElementById('location-type')?.value || '';
+    const location = (document.getElementById('location')?.value || '').trim();
+    const address = (document.getElementById('address')?.value || '').trim();
+    const transportFee = parseFloat(document.getElementById('transport-fee')?.value) || 0;
+    const invoiceCode = (document.getElementById('invoice-code')?.value) || generateInvoiceCode();
+
+    if (!clientName) return showMessage('Please enter client name','error');
+    if (!eventDateRaw) return showMessage('Please select event date','error');
+
+    const items = Object.keys(s || {});
+    if (!items.length) return showMessage('Select at least one menu item','error');
+
+    // build items rows and subtotal
+    let subtotal = 0;
+    let rows = '';
+    items.forEach(name => {
+      const it = s[name];
+      const line = (parseFloat(it.p) || 0) * (parseInt(it.q) || 1);
+      subtotal += line;
+      rows += `<tr style="border-bottom:1px solid #ddd">
+        <td style="padding:12px 0;font-size:14px">${name}</td>
+        <td style="padding:12px 0;font-size:14px;text-align:right">₦${(it.p).toLocaleString()}</td>
+        <td style="padding:12px 0;font-size:14px;text-align:center">${it.q}</td>
+        <td style="padding:12px 0;font-size:14px;text-align:right;font-weight:700">₦${line.toLocaleString()}</td>
+      </tr>`;
     });
-    
-    const serviceCharge = subtotalAmount * (serviceChargeRate / 100);
-    const transportationFee = parseFloat(document.getElementById('transport-fee').value) || 0;
-    const vat = serviceCharge * 0.075;
-    const grandTotal = subtotalAmount + serviceCharge + vat + transportationFee;
-    
-    document.getElementById('subtotal').textContent = '₦' + subtotalAmount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('service-charge').textContent = '₦' + serviceCharge.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('vat-amount').textContent = '₦' + vat.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('transport-amount').textContent = '₦' + transportationFee.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('grand-total').textContent = '₦' + grandTotal.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
 
-function generatePDF(){
-    const el = document.getElementById('invoice-to-print');
-    if(!el || el.innerHTML.trim()===''){
-        alert('No invoice to export. Please generate the invoice first.');
-        return;
+    const calc = updateCalculations(subtotal);
+    const balanceDue = calc.total + transportFee;
+
+    // Build invoice HTML matching design image
+    const invoiceDate = new Date().toLocaleDateString();
+    const dueDate = new Date(); dueDate.setDate(new Date().getDate() + 7);
+    const dueDateFormatted = dueDate.toLocaleDateString();
+
+    const invoiceHtml = `
+      <div style="max-width:900px;margin:0 auto;font-family:Arial,sans-serif;background:#fff;color:#222;padding:40px">
+        
+        <!-- Header with Logo (Left) and Date (Right) -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;gap:20px">
+          <!-- Logo & Company Details (Left) -->
+          <div style="flex:1">
+            <div style="display:flex;align-items:flex-start;gap:15px">
+             
+              <div style="flex:1;font-size:12px;line-height:1.5;color:#333">
+               <div style="flex-shrink:0">
+                <img src="cuisine-logo.jpg" style="width:70px;height:auto" alt="logo" />
+              </div>
+                <div style="font-weight:900;font-size:13px;margin-bottom:3px">Cuisine Fantastique</div>
+                <div>Lekki Peninsula Scheme 2</div>
+                <div>Road 10b, Femi Olugbile street, Lagos</div>
+                <div>Phone: 08158894642</div>
+                <div>Email: cuisinefantastique1@gmail.com</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Date (Right) -->
+          <div style="text-align:right;font-size:14px;font-weight:900;color:#dc2626;letter-spacing:1px">
+            ${eventDateFormatted}
+          </div>
+        </div>
+
+        <!-- Horizontal Line -->
+        <div style="border-top:3px solid #dc2626;margin-bottom:30px"></div>
+
+        <!-- Bill To & Invoice Details (Two Columns) -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:30px">
+          <!-- Bill To -->
+          <div>
+            <div style="font-size:13px;font-weight:900;color:#dc2626;margin-bottom:8px;border-left:4px solid #dc2626;padding-left:10px">BILL TO</div>
+            <div style="font-size:14px;font-weight:700">${clientName}</div>
+          </div>
+
+          <!-- Invoice Details -->
+          <div>
+            <div style="font-size:13px;font-weight:900;color:#dc2626;margin-bottom:8px;border-left:4px solid #dc2626;padding-left:10px">INVOICE DETAILS</div>
+            <div style="font-size:13px;line-height:1.6;color:#333">
+              <div><strong>Invoice #:</strong> ${invoiceCode}</div>
+              <div><strong>Invoice Date:</strong> ${invoiceDate}</div>
+              <div><strong>Due Date:</strong> ${dueDateFormatted}</div>
+              <div><strong>Balance Due:</strong> <span style="font-weight:900;color:#dc2626">₦${balanceDue.toLocaleString()}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div style="margin-bottom:30px">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="background:#dc2626;color:#fff">
+                <th style="padding:12px;text-align:left;font-size:13px;font-weight:900">Description</th>
+                <th style="padding:12px;text-align:right;font-size:13px;font-weight:900">Rate</th>
+                <th style="padding:12px;text-align:center;font-size:13px;font-weight:900">Qty</th>
+                <th style="padding:12px;text-align:right;font-size:13px;font-weight:900">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Horizontal Line -->
+        <div style="border-top:3px solid #dc2626;margin-bottom:30px"></div>
+
+        <!-- Summary & Payment (Two Columns) -->
+        <div style="display:grid;grid-template-columns:1fr 350px;gap:30px;margin-bottom:30px">
+          
+          <!-- Payment Instructions (Left) -->
+          <div>
+            <div style="font-size:14px;font-weight:900;color:#dc2626;margin-bottom:15px;border-left:4px solid #dc2626;padding-left:10px">PAYMENT INSTRUCTIONS</div>
+            
+            <div style="font-size:13px;margin-bottom:15px">
+              <div style="font-weight:900;margin-bottom:6px">Bank Transfer:</div>
+              <div style="margin-left:0;font-size:12px;line-height:1.5;color:#555">
+                <div><strong>Account Number:</strong> 2094187584</div>
+                <div><strong>Account Name:</strong> Cuisine Fantastique</div>
+                <div><strong>Bank Name:</strong> UBA</div>
+              </div>
+            </div>
+
+            <div style="font-size:13px;font-weight:900;color:#dc2626;margin-bottom:10px;margin-top:15px">IMPORTANT TERMS & CONDITIONS</div>
+            <div style="font-size:12px;line-height:1.6;color:#333;border-left:4px solid #dc2626;padding-left:10px">
+              <div style="margin-bottom:6px">• A 100% non-refundable payment is required as commitment/booking fee</div>
+              <div style="margin-bottom:6px">• All payments are non-refundable</div>
+              <div style="margin-bottom:6px">• Kindly check if we are still available on your chosen date before paying a deposit</div>
+              <div style="margin-bottom:6px">• In the case of a cancellation, all payments made are only transferable and cannot be refunded</div>
+              <div>• Please NOTE that the invoice is only valid for one month and prices can change based on market price</div>
+            </div>
+          </div>
+
+          <!-- Summary Box (Right) -->
+          <div style="border-left:4px solid #dc2626;padding-left:15px">
+            <div style="font-size:13px;margin-bottom:12px;line-height:1.8">
+              <div style="display:flex;justify-content:space-between">
+                <span>Subtotal:</span>
+                <span style="font-weight:700;color:#dc2626">₦${subtotal.toLocaleString()}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <span>Service Charge (${SERVICE_RATE_PERCENT}%):</span>
+                <span style="font-weight:700;color:#dc2626">₦${calc.serviceCharge.toLocaleString()}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <span>Transportation Fee:</span>
+                <span style="font-weight:700;color:#dc2626">₦${transportFee.toLocaleString()}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;margin-top:8px">
+                <span>VAT (7.5% on Service Charge):</span>
+                <span style="font-weight:700">₦${calc.vat.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div style="background:#dc2626;color:#fff;padding:12px;border-radius:4px;text-align:center;margin-top:12px;font-weight:900;font-size:16px">
+              GRAND TOTAL:<br>₦${balanceDue.toLocaleString()}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align:center;font-size:11px;color:#999;margin-top:30px;line-height:1.5">
+          <div>Thank you for choosing Cuisine Fantastique</div>
+          <div>Generated: ${new Date().toLocaleDateString()}</div>
+        </div>
+
+      </div>
+    `;
+
+    const preview = document.getElementById('invoice-to-print');
+    const previewWrap = document.getElementById('invoice-preview');
+    if (preview && previewWrap) {
+      preview.innerHTML = invoiceHtml;
+      previewWrap.classList.add('active');
+      previewWrap.style.display = 'block';
+      document.getElementById('invoice-code').value = invoiceCode;
+      window.lastInvoiceId = invoiceCode;
+      previewWrap.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      showMessage('Preview container not found','error');
     }
-
-    updateCalculations();
-
-    const filename = 'Invoice-' + (window.lastInvoiceId || Date.now()) + '.pdf';
-    const opt = {
-        margin:       5,
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 4, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-    };
-
-    html2pdf().set(opt).from(el).save()
-        .then(() => { /* success */ })
-        .catch(err => { console.error(err); alert('PDF generation failed. Please try again.'); });
+  } catch (err) {
+    console.error('generateInvoice error', err);
+    showMessage('Error generating invoice: ' + (err.message || 'unknown'), 'error');
+  }
 }
 
-init();
+/* PDF generation */
+function generatePDF(){
+  const el = document.getElementById('invoice-to-print');
+  if (!el || !el.innerHTML.trim()) return showMessage('No invoice to export. Generate invoice first.','error');
 
+  const filename = 'Invoice-' + (window.lastInvoiceId || Date.now()) + '.pdf';
+  const opt = {
+    margin: 10,
+    filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 4, useCORS: true, logging: false },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'] }
+  };
 
-    
+  html2pdf().set(opt).from(el).save()
+    .then(() => showMessage('PDF generated','success'))
+    .catch(e => { console.error(e); showMessage('PDF generation failed','error'); });
+}
+
+/* Save/load basics */
+function saveCurrentInvoice(){
+  const code = document.getElementById('invoice-code')?.value || generateInvoiceCode();
+  const snapshot = {
+    code,
+    clientName: document.getElementById('client-name')?.value || '',
+    eventDate: document.getElementById('event-date')?.value || '',
+    guests: document.getElementById('guests')?.value || '',
+    locationType: document.getElementById('location-type')?.value || '',
+    location: document.getElementById('location')?.value || '',
+    address: document.getElementById('address')?.value || '',
+    transportFee: document.getElementById('transport-fee')?.value || 0,
+    items: s,
+    savedAt: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem('invoice_' + code, JSON.stringify(snapshot));
+    showMessage('Invoice saved','success');
+    document.getElementById('invoice-code').value = code;
+  } catch (e) {
+    console.error(e);
+    showMessage('Save failed','error');
+  }
+}
+function loadInvoiceData(){
+  const code = (document.getElementById('invoiceCodeInput')?.value || '').trim();
+  if (!code) return showMessage('Enter invoice code','error');
+  const saved = localStorage.getItem('invoice_' + code);
+  if (!saved) return showMessage('Invoice not found','error');
+  try {
+    const obj = JSON.parse(saved);
+    document.getElementById('invoice-code').value = obj.code || '';
+    document.getElementById('client-name').value = obj.clientName || '';
+    document.getElementById('event-date').value = obj.eventDate || '';
+    document.getElementById('guests').value = obj.guests || '';
+    document.getElementById('location-type').value = obj.locationType || '';
+    document.getElementById('location').value = obj.location || '';
+    document.getElementById('address').value = obj.address || '';
+    document.getElementById('transport-fee').value = obj.transportFee || 0;
+    s = obj.items || {};
+    renderSelectedItems();
+    renderMenuItems(document.getElementById('search-input')?.value || '');
+    toggleLoadPrompt();
+    showMessage('Invoice loaded','success');
+  } catch (e) {
+    console.error(e);
+    showMessage('Load failed','error');
+  }
+}
+
+/* UI helpers */
+function toggleLoadPrompt(){
+  const p = document.getElementById('loadInvoicePrompt');
+  if (!p) return;
+  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+
+/* Category filter */
+function renderCategoryFilter() {
+  const filterContainer = document.getElementById('category-filter');
+  if (!filterContainer) return;
+  
+  // Get unique categories from menu items
+  const categories = [...new Set(m.map(item => item.c))].sort();
+  
+  // Add "All" button first
+  filterContainer.innerHTML = `<button class="category-btn active" onclick="filterByCategory('')">All</button>`;
+  filterContainer.innerHTML += categories.map(cat => 
+    `<button class="category-btn" onclick="filterByCategory('${escapeJS(cat)}')">${cat}</button>`
+  ).join('');
+}
+
+function filterByCategory(category) {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.value = category;
+    renderMenuItems(category);
+  }
+  // Update active button state
+  const buttons = document.querySelectorAll('.category-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// Boot
+document.addEventListener('DOMContentLoaded', init);

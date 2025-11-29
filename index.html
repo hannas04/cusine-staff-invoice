@@ -1,80 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cuisine Fantastique - Invoice Generator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-   <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cuisine Fantastique - Invoice Generator</title>
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- html2pdf CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:20px">
-            <div style="display:flex;align-items:center;gap:8px;flex:1">
-                <i class="fas fa-lock" style="font-size:20px;color:#dc2626"></i>
-                <div style="font-size:12px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:1px">For Staff Only</div>
-            </div>
-            <!-- <div style="text-align:center;flex:2">
-                <h1 style="margin:0">Cuisine Fantastique</h1>
-                <p class="subtitle">Premium Catering Services - Invoice Generator</p>
-            </div> -->
-            <div style="flex:1;text-align:right">
-                <img src="cuisine-logo.jpg" alt="Cuisine Fantastique Logo" style="max-height:50px;max-width:100px;object-fit:contain">
-            </div>
-        </div>
-    </header>
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="header-left">
+        <img src="cuisine-logo.jpg" alt="Cuisine Fantastique Logo" class="header-logo" />
+       
+      </div>
 
-    <div class="container">
-        <div class="form-section">
-            <div class="section-title"><i class="fas fa-calendar-alt"></i> Event Details</div>
-            <div class="form-row">
-                <div><label>Client Name</label><input type="text" id="client-name" placeholder="e.g., John Doe" required></div>
-                <div><label>Event Date</label><input type="date" id="event-date" required></div>
-                <div><label>Number of Guests</label><input type="number" id="guests" min="1" required></div>
-            </div>
-            <div class="form-row">
-                <div><label>Location Type</label><select id="location-type" onchange="updateServiceChargeRate()" required>
-                    <option value="">Select Location</option>
-                    <option value="lagos">Within Lagos</option>
-                    <option value="outside">Outside Lagos</option>
-                </select></div>
-                <div><label>Location Area</label><input type="text" id="location" placeholder="e.g., Mainland" required></div>
-                <div><label>Hall/Address</label><input type="text" id="address" placeholder="Event venue" required></div>
-            </div>
-            <div class="form-row">
-                <div><label>Transportation Fee (₦)</label><input type="number" id="transport-fee" value="5000" min="0"></div>
-            </div>
+      <div class="header-right">
+        <div class="header-contact">
+          <div class="contact-item">
+            <i class="fas fa-phone" style="color:#dc2626"></i>
+            <span>08158894642</span>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope" style="color:#dc2626"></i>
+            <span>cuisinefantastique1@gmail.com</span>
+          </div>
         </div>
+        <button class="staff-badge">
+          <i class="fas fa-lock"></i> For Staff Only
+        </button>
+      </div>
+    </div>
+  </header>
 
-        <div class="form-section">
-            <div class="section-title"><i class="fas fa-plus-circle"></i> Create Custom Menu</div>
-            <div class="form-row">
-                <div><label>Menu Name</label><input type="text" id="custom-menu-name" placeholder="e.g., Custom Dish"></div>
-                <div><label>Price (₦)</label><input type="number" id="custom-menu-price" min="0" value="0"></div>
-                <div><label>Quantity</label><input type="number" id="custom-menu-qty" min="1" value="1"></div>
+  <!-- main app UI (kept outside print) -->
+  <div class="app-ui">
+    <!-- Edit Invoice Section -->
+    <div class="form-section" style="background-color:#f0f9ff;border-left:4px solid #0284c7">
+        <div class="section-title"><i class="fas fa-edit"></i> Load & Edit Previous Invoice</div>
+        <button class="generate-btn" id="editInvoiceBtn" onclick="toggleLoadPrompt()">
+            <i class="fas fa-redo"></i> Load Saved Invoice
+        </button>
+        
+        <div id="loadInvoicePrompt" class="load-invoice-prompt" style="display:none;margin-top:15px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <div style="flex:1;min-width:250px">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;font-size:14px;color:#333">Invoice Code</label>
+                    <input type="text" id="invoiceCodeInput" placeholder="e.g., INV-MOCK1" style="width:100%;padding:10px;border:2px solid #0284c7;border-radius:4px;font-size:14px;box-sizing:border-box">
+                </div>
+                <button class="generate-btn" id="loadDataBtn" onclick="loadInvoiceData()" style="margin:0">
+                    <i class="fas fa-download"></i> Load Invoice
+                </button>
             </div>
-            <button class="generate-btn" onclick="addCustomMenu()" style="margin-top:10px"><i class="fas fa-check"></i> Add to Selected Items</button>
-        </div>
-
-        <div class="form-section">
-            <div class="section-title"><i class="fas fa-utensils"></i> Select Menu Items</div>
-            <div class="search-bar"><div style="position:relative"><input type="text" class="search-input" id="search-input" placeholder="Search for menu items..."><i class="fas fa-search search-icon"></i></div></div>
-            <div class="category-filter" id="category-filter"></div>
-            <div class="menu-grid" id="menu-grid"></div>
-            <div class="selected-items" id="selected-items-container" style="display:none">
-                <h3 style="color:#dc2626;margin-bottom:12px">Selected Items</h3>
-                <div id="selected-items"></div>
-            </div>
-            <button class="generate-btn" onclick="generateInvoice()"><i class="fas fa-file-invoice"></i> Generate Invoice</button>
-        </div>
-
-        <div id="invoice-preview">
-            <div id="invoice-to-print"></div>
-            <button class="download-btn" onclick="generatePDF()"><i class="fas fa-download"></i> Download PDF</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="form-section">
+        <div class="section-title"><i class="fas fa-calendar-alt"></i> Event Details</div>
+        <div class="form-row">
+            <div><label>Invoice Code</label><input type="text" id="invoice-code" placeholder="Auto-generated" readonly style="background-color:#f3f4f6;cursor:not-allowed"></div>
+            <div><label>Client Name</label><input type="text" id="client-name" placeholder="e.g., John Doe" required></div>
+            <div><label>Event Date</label><input type="date" id="event-date" required></div>
+        </div>
+        <div class="form-row">
+            <div><label>Number of Guests</label><input type="number" id="guests" min="1" required></div>
+            <div><label>Location Type</label><select id="location-type" onchange="updateServiceChargeRate()" required>
+                <option value="">Select Location</option>
+                <option value="lagos">Within Lagos</option>
+                <option value="outside">Outside Lagos</option>
+            </select></div>
+            <div><label>Location Area</label><input type="text" id="location" placeholder="e.g., Mainland" required></div>
+        </div>
+        <div class="form-row">
+            <div><label>Hall/Address</label><input type="text" id="address" placeholder="Event venue" required></div>
+            <div><label>Transportation Fee (₦)</label><input type="number" id="transport-fee" value="5000" min="0"></div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="section-title"><i class="fas fa-plus-circle"></i> Create Custom Menu</div>
+        <div class="form-row">
+            <div><label>Menu Name</label><input type="text" id="custom-menu-name" placeholder="e.g., Custom Dish"></div>
+            <div><label>Price (₦)</label><input type="number" id="custom-menu-price" min="0" value="0"></div>
+            <div><label>Quantity</label><input type="number" id="custom-menu-qty" min="1" value="1"></div>
+        </div>
+        <button class="generate-btn" onclick="addCustomMenu()" style="margin-top:10px"><i class="fas fa-check"></i> Add to Selected Items</button>
+    </div>
+
+    <div class="form-section">
+        <div class="section-title"><i class="fas fa-utensils"></i> Select Menu Items</div>
+        <div class="search-bar"><div style="position:relative"><input type="text" class="search-input" id="search-input" placeholder="Search for menu items..."><i class="fas fa-search search-icon"></i></div></div>
+        <div class="category-filter" id="category-filter"></div>
+        <div class="menu-grid" id="menu-grid"></div>
+        <div class="selected-items" id="selected-items-container" style="display:none">
+            <h3 style="color:#dc2626;margin-bottom:12px">Selected Items</h3>
+            <div id="selected-items"></div>
+        </div>
+        <button class="generate-btn" onclick="generateInvoice()"><i class="fas fa-file-invoice"></i> Generate Invoice</button>
+    </div>
+  </div>
+
+  <!-- Invoice target (JS will populate content inside) -->
+  <div id="invoice-preview">
+    <div id="invoice-to-print" class="invoice-container">
+      <!-- HEADER: Logo left + event date right -->
+      <div class="invoice-header">
+        <div class="invoice-header-left">
+          <img src="cuisine-logo.jpg" alt="Cuisine Fantastique" class="invoice-logo" />
+          <div class="company-details">
+            <div class="company-name">Cuisine Fantastique</div>
+            <div class="company-address">Lekki Peninsula Scheme 2<br>Road 10b, Femi Olugbile street, Lagos</div>
+            <div class="company-contact">P: 08158894642<br>cuisinefantastique1@gmail.com</div>
+          </div>
+        </div>
+
+        <div class="invoice-header-right">
+          <!-- JS will insert event date text here -->
+          <div id="invoice-event-date" class="invoice-event-date">FRIDAY, NOVEMBER 21, 2025</div>
+        </div>
+      </div>
+
+      <hr class="invoice-sep">
+
+      <!-- Billing & invoice details -->
+      <div class="bill-details">
+        <div class="bill-to">
+          <div class="block-title">BILL TO</div>
+          <div id="invoice-bill-to" class="bill-to-name">Client Name</div>
+        </div>
+        <div class="invoice-details">
+          <div class="block-title">INVOICE DETAILS</div>
+          <div><strong>Invoice #:</strong> <span id="invoice-code-out">INV-...</span></div>
+          <div><strong>Invoice Date:</strong> <span id="invoice-date-out">MM/DD/YYYY</span></div>
+          <div><strong>Due Date:</strong> <span id="invoice-due-out">MM/DD/YYYY</span></div>
+          <div><strong>Balance Due:</strong> <span id="invoice-balance-out">₦0</span></div>
+        </div>
+      </div>
+
+      <!-- Items table (full width) -->
+      <table class="invoice-items-table" role="table" aria-label="Invoice items">
+        <thead>
+          <tr>
+            <th>DESCRIPTION</th>
+            <th style="text-align:right">RATE</th>
+            <th style="text-align:center">QTY</th>
+            <th style="text-align:right">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody id="invoice-items-body">
+          <!-- JS will inject <tr> item rows here -->
+        </tbody>
+      </table>
+
+      <!-- Calculation summary (must come BEFORE payment instructions per your request) -->
+      <table class="invoice-summary-block" aria-label="Invoice summary">
+        <tbody>
+          <tr>
+            <td>SUBTOTAL</td>
+            <td style="text-align:right" id="sum-subtotal">₦0</td>
+          </tr>
+          <tr>
+            <td>SERVICE CHARGE (20%)</td>
+            <td style="text-align:right" id="sum-service">₦0</td>
+          </tr>
+          <tr>
+            <td>VAT (7.5% on Service Charge)</td>
+            <td style="text-align:right" id="sum-vat">₦0</td>
+          </tr>
+          <tr>
+            <td>TRANSPORTATION</td>
+            <td style="text-align:right" id="sum-transport">₦0</td>
+          </tr>
+          <tr class="summary-total">
+            <td>GRAND TOTAL</td>
+            <td style="text-align:right;font-weight:900;color:#c00" id="sum-total">₦0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Payment instructions (after summary) -->
+      <div class="payment-block">
+        <div class="block-title">PAYMENT INSTRUCTIONS</div>
+        <div class="payment-body">
+          <div><strong>Bank Transfer:</strong></div>
+          <div>Account Number: 2094187584</div>
+          <div>Account Name: Cuisine Fantastique</div>
+          <div>Bank Name: UBA</div>
+
+          <div class="important-terms">
+            <strong>IMPORTANT TERMS & CONDITIONS</strong>
+            <ul>
+              <li>A 100% non-refundable payment is required as commitment/booking fee</li>
+              <li>All payments are non-refundable</li>
+              <li>Kindly check availability before paying a deposit</li>
+              <li>In case of cancellation, payments are transferable and non-refundable</li>
+              <li>The invoice is valid for one month; prices may change with market price</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-footer">
+        <div class="vat-note">* VAT is charged on the Service Charge only.</div>
+        <div class="thank-you">Thank you for choosing Cuisine Fantastique</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
