@@ -72,6 +72,23 @@
         .empty-state{text-align:center;padding:30px;color:#666}
         
         /* NEW STYLES FOR MANAGE SECTION */
+        .manage-toggle-btn {
+            background: #333;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .manage-toggle-btn:hover { background: #555; }
+        
         .manage-btn {
             background: #333;
             color: white;
@@ -227,23 +244,29 @@
 
     <div class="container">
         
-        <!-- NEW MANAGE SECTION -->
+        <!-- UPDATED MANAGE SECTION WITH TOGGLE -->
         <div class="form-section" style="background:#f0f0f0; border-left: 4px solid #333;">
-            <div class="section-title" style="color:#333"><i class="fas fa-tasks"></i> Manage Existing Invoices</div>
-            <div class="form-row">
-                <div>
-                    <label>Edit Invoice (Enter Invoice Code)</label>
-                    <div style="display:flex; gap:5px;">
-                        <input type="text" id="retrieve-id" placeholder="e.g., INV-173..." style="border-color:#666;">
-                        <button class="manage-btn" onclick="retrieveInvoice()">Load to Edit</button>
+            <button class="manage-toggle-btn" onclick="toggleManageSection()">
+                <span><i class="fas fa-tasks"></i> Manage / Edit Existing Invoices</span>
+                <i id="manage-toggle-icon" class="fas fa-chevron-down"></i>
+            </button>
+            
+            <div id="manage-section-content" style="display:none; margin-top:15px; padding-top:10px; border-top:1px solid #ddd;">
+                <div class="form-row">
+                    <div>
+                        <label>Edit Invoice (Enter Invoice Code)</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="retrieve-id" placeholder="e.g., INV-173..." style="border-color:#666;">
+                            <button class="manage-btn" onclick="retrieveInvoice()">Load to Edit</button>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label>Update Payment (Code & Amount Paid)</label>
-                    <div style="display:flex; gap:5px;">
-                        <input type="text" id="payment-id" placeholder="Invoice Code" style="border-color:#666;">
-                        <input type="number" id="payment-amount" placeholder="Amount Paid" style="border-color:#666;">
-                        <button class="manage-btn" onclick="applyPayment()">Generate Updated Invoice</button>
+                    <div>
+                        <label>Update Payment (Code & Amount Paid)</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="text" id="payment-id" placeholder="Invoice Code" style="border-color:#666;">
+                            <input type="number" id="payment-amount" placeholder="Amount Paid" style="border-color:#666;">
+                            <button class="manage-btn" onclick="applyPayment()">Generate Updated Invoice</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +281,6 @@
             <div class="form-row">
                 <div><label>Client Name</label><input type="text" id="client-name" placeholder="e.g., John Doe" required></div>
                 <div><label>Event Date</label><input type="date" id="event-date" required></div>
-                <!-- REMOVED GUESTS INPUT AS REQUESTED -->
             </div>
             <div class="form-row">
                 <div><label>Location Type</label><select id="location-type" onchange="updateServiceChargeRate()" required>
@@ -271,6 +293,8 @@
             </div>
             <div class="form-row">
                 <div><label>Transportation Fee (₦)</label><input type="number" id="transport-fee" value="5000" min="0"></div>
+                <!-- NEW DISCOUNT INPUT -->
+                <div><label>Discount (₦) - Optional</label><input type="number" id="discount" placeholder="Enter discount amount" min="0" value="0" style="border-color:#059669"></div>
             </div>
         </div>
 
@@ -540,6 +564,21 @@ function updateQty(n,q){ s[n].q = parseInt(q) || 1; renderSelectedItems(); }
 
 function removeItem(n){ delete s[n]; renderMenuItems(document.getElementById('search-input').value || ''); renderSelectedItems(); }
 
+// --- NEW FUNCTION: Toggle Manage Section ---
+function toggleManageSection() {
+    const section = document.getElementById('manage-section-content');
+    const icon = document.getElementById('manage-toggle-icon');
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    } else {
+        section.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
 // --- NEW FEATURE: Retrieve Existing Invoice ---
 function retrieveInvoice() {
     const id = document.getElementById('retrieve-id').value.trim();
@@ -567,6 +606,7 @@ function retrieveInvoice() {
     document.getElementById('location').value = data.locArea;
     document.getElementById('address').value = data.addr;
     document.getElementById('transport-fee').value = data.transport;
+    document.getElementById('discount').value = data.discount || 0; // Populate discount
     
     // Set IDs
     document.getElementById('current-invoice-id').value = data.id;
@@ -649,6 +689,7 @@ function generateInvoice(){
     const rows = items.map(n=>{ const i=s[n], tot=i.p*i.q; sub+=tot; return `<tr class="invoice-item"><td>${n}</td><td style="text-align:right">₦${i.p.toLocaleString()}</td><td style="text-align:center">${i.q}</td><td style="text-align:right">₦${tot.toLocaleString()}</td></tr>` }).join('');
     
     const t=parseFloat(document.getElementById('transport-fee').value)||0;
+    const discount = parseFloat(document.getElementById('discount').value)||0; // Get discount
     
     // --- UPDATED SERVICE CHARGE LOGIC ---
     let sc = 0;
@@ -664,7 +705,8 @@ function generateInvoice(){
     // -------------------------------------
 
     const vat = sc * 0.075;
-    const gt = sub + sc + vat + t;
+    // Calculate Grand Total with Discount
+    const gt = (sub + sc + vat + t) - discount;
     
     // Payment Calculations
     const amountPaid = parseFloat(document.getElementById('current-amount-paid').value) || 0;
@@ -680,6 +722,7 @@ function generateInvoice(){
         locArea: l,
         addr: a,
         transport: t,
+        discount: discount, // Save discount
         items: s,
         paid: amountPaid,
         timestamp: Date.now()
@@ -692,6 +735,13 @@ function generateInvoice(){
         `<div class="summary-row" style="color: green; font-weight: bold;">
             <span class="summary-label">Amount Paid:</span>
             <span class="summary-value">₦${amountPaid.toLocaleString()}</span>
+        </div>` : '';
+    
+    // Discount Row
+    const discountRow = discount > 0 ? 
+        `<div class="summary-row" style="color: #dc2626;">
+            <span class="summary-label">✨ Special Discount:</span>
+            <span class="summary-value">-₦${discount.toLocaleString()}</span>
         </div>` : '';
         
     const balanceLabel = amountPaid > 0 ? "BALANCE DUE:" : "GRAND TOTAL:";
@@ -752,6 +802,7 @@ function generateInvoice(){
             <span class="summary-label" style="color:#666"><em>VAT (7.5% on Service Charge):</em></span>
             <span class="summary-value" id="vat-amount" style="color:#666">₦${vat.toLocaleString()}</span>
         </div>
+        ${discountRow}
         ${amountPaid > 0 ? 
         `<div class="summary-row grand-total" style="background:#666; font-size:11px;">
             <span class="summary-label">Total Amount:</span>
@@ -812,8 +863,10 @@ function updateCalculations(){
     // ------------------------------
 
     const transportationFee = parseFloat(document.getElementById('transport-fee').value) || 0;
+    const discount = parseFloat(document.getElementById('discount').value) || 0; // Discount calc
+    
     const vat = serviceCharge * 0.075;
-    const grandTotal = subtotalAmount + serviceCharge + vat + transportationFee;
+    const grandTotal = (subtotalAmount + serviceCharge + vat + transportationFee) - discount;
     
     document.getElementById('subtotal').textContent = '₦' + subtotalAmount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     document.getElementById('service-charge').textContent = '₦' + serviceCharge.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
