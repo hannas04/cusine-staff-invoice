@@ -3,906 +3,1763 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cuisine Fantastique - Invoice Generator</title>
+    <title>Cuisine Fantastique - Professional Invoice Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-   <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#fff 0%,#ffe6e6 100%);min-height:100vh;padding-top:90px}
-        header{position:fixed;top:0;left:0;right:0;background:#fff;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;text-align:center}
-        h1{color:#dc2626;font-size:1.8em;text-transform:uppercase;letter-spacing:2px}
-        .subtitle{color:#666;font-style:italic;font-size:13px}
-        .container{max-width:1400px;margin:0 auto;padding:15px}
-        .form-section{background:#fff;padding:20px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1);margin-bottom:20px}
-        .section-title{color:#dc2626;font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-        .form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
-        label{display:block;margin-bottom:5px;color:#333;font-weight:600;font-size:12px}
-        input,select{width:100%;padding:8px;border:2px solid #e5e5e5;border-radius:5px;font-size:12px;transition:border-color 0.2s}
-        input:focus,select:focus{outline:none;border-color:#dc2626}
-        .search-bar{position:sticky;top:90px;background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);margin-bottom:15px;z-index:100}
-        .search-input{width:100%;padding:10px 40px 10px 12px;border:2px solid #dc2626;border-radius:6px;font-size:13px}
-        .search-icon{position:absolute;right:25px;top:50%;transform:translateY(-50%);color:#dc2626}
-        .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:15px}
-        .menu-item-card{background:#fff;border:2px solid #e5e5e5;border-radius:6px;padding:12px;cursor:pointer;transition:all 0.2s}
-        .menu-item-card:hover{border-color:#dc2626;transform:translateY(-2px);box-shadow:0 3px 10px rgba(220,38,38,0.2)}
-        .menu-item-card.selected{border-color:#dc2626;background:#fff5f5}
-        .item-name{font-weight:600;color:#333;font-size:13px;margin-bottom:4px}
-        .item-price{color:#dc2626;font-weight:700;font-size:14px}
-        .item-category{font-size:10px;color:#666;margin-bottom:6px;text-transform:uppercase}
-        .category-filter{display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap}
-        .filter-btn{padding:6px 14px;background:#fff;border:2px solid #dc2626;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;color:#dc2626;transition:all 0.2s}
-        .filter-btn:hover,.filter-btn.active{background:#dc2626;color:#fff}
-        .selected-items{background:#f9f9f9;padding:15px;border-radius:8px;margin-bottom:15px}
-        .selected-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;border-radius:5px;margin-bottom:8px;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
-        .selected-item-info{flex:1}
-        .qty-input{width:60px;padding:5px;text-align:center;margin:0 8px;font-size:12px}
-        .remove-btn{background:#dc2626;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:11px}
-        .generate-btn{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:12px 35px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;width:100%;margin-top:15px}
-        .generate-btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(220,38,38,0.4)}
-        #invoice-preview{background:#fff;padding:15px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1);display:none;max-width:900px;margin:15px auto}
-        #invoice-preview.active{display:block}
-        .invoice-logo{max-height:60px;margin-bottom:10px}
-        .invoice-header-details{font-size:11px;color:#666;margin-bottom:15px;line-height:1.6}
-        .invoice-header-details strong{color:#333}
-        .invoice-header{border-bottom:2px solid #dc2626;padding-bottom:12px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:flex-start}
-        .invoice-left{flex:1}
-        .invoice-title{font-size:28px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:2px}
-        .invoice-details{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;font-size:10px}
-        .detail-box{background:#f9f9f9;padding:10px;border-radius:5px;border-left:3px solid #dc2626}
-        .detail-box h3{color:#dc2626;margin-bottom:6px;font-size:11px;text-transform:uppercase}
-        .detail-box p{margin:3px 0;color:#333}
-        .items-table{width:100%;border-collapse:collapse;margin:15px 0;font-size:10px}
-        .items-table th{background:#dc2626;color:#fff;padding:8px;text-align:left;font-weight:700}
-        .items-table td{padding:8px;border-bottom:1px solid #e5e5e5}
-        .items-table .invoice-item{font-size:10px}
-        .invoice-item td:nth-child(2),.invoice-item td:nth-child(3),.invoice-item td:nth-child(4){text-align:right}
-        .invoice-summary-block{margin-top:15px;padding:12px;background:#f9f9f9;border-radius:5px;border-left:3px solid #dc2626}
-        .summary-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e5e5;font-size:10px}
-        .summary-row.grand-total{background:#dc2626;color:#fff;padding:10px;border-radius:4px;font-size:12px;font-weight:700;border-bottom:none;margin-top:8px}
-        .summary-label{font-weight:600;color:#333}
-        .summary-value{text-align:right;color:#dc2626;font-weight:600}
-        .summary-row.grand-total .summary-value{color:#fff}
-        .payment-block{margin-top:20px;padding:12px;background:#fff5f5;border-radius:5px;border-left:3px solid #dc2626;font-size:9px;line-height:1.6}
-        .payment-block h3{color:#dc2626;margin-bottom:8px;font-size:11px;text-transform:uppercase}
-        .bank-details{background:#fff;padding:8px;border-radius:4px;margin:6px 0;font-weight:600;color:#333}
-        .payment-block ul{margin-left:18px;margin-top:6px}
-        .payment-block li{margin-bottom:3px;color:#333}
-        .download-btn{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;padding:12px 35px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;width:100%;margin-top:15px}
-        .download-btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(5,150,105,0.4)}
-        .empty-state{text-align:center;padding:30px;color:#666}
-        
-        /* NEW STYLES FOR MANAGE SECTION */
-        .manage-toggle-btn {
-            background: #333;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 700;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fff 0%, #ffe6e6 100%); min-height: 100vh; padding-top: 90px; color: #333; }
+        header { position: fixed; top: 0; left: 0; right: 0; background: #fff; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 15px; }
+        .form-section { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); margin-bottom: 20px; transition: all 0.3s ease; }
+        .section-title { color: #dc2626; font-size: 16px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; color: #333; font-weight: 700; font-size: 12px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 2px solid #e5e5e5; border-radius: 5px; font-size: 14px; font-weight: 700; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #dc2626; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .menu-item-card { background: #fff; border: 2px solid #e5e5e5; border-radius: 6px; padding: 12px; cursor: pointer; transition: all 0.2s ease; }
+        .menu-item-card:hover { border-color: #dc2626; transform: translateY(-2px); }
+        .menu-item-card.selected { border-color: #dc2626; background: #fff5f5; }
+        .item-name { font-weight: 800; color: #333; font-size: 13px; margin-bottom: 4px; }
+        .item-price { color: #dc2626; font-weight: 800; font-size: 14px; }
+        .item-category { font-size: 10px; color: #666; margin-bottom: 6px; text-transform: uppercase; font-weight: 800; }
+        .filter-btn { padding: 6px 14px; background: #fff; border: 2px solid #dc2626; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 800; color: #dc2626; transition: all 0.2s; }
+        .filter-btn:hover, .filter-btn.active { background: #dc2626; color: #fff; }
+        .generate-btn { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border: none; padding: 12px 35px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 800; width: 100%; margin-top: 15px; }
+        .wizard-steps { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
+        .step { flex: 1; text-align: center; padding: 10px; background: #e5e5e5; color: #666; border-radius: 5px; font-weight: 800; transition: all 0.3s; min-width: 120px; }
+        .step.active { background: #dc2626; color: #fff; }
+        .step.completed { background: #059669; color: #fff; }
+        .nav-btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 800; transition: all 0.2s; flex: 1; }
+        .prev-btn { background: #ccc; color: #333; }
+        .next-btn { background: #dc2626; color: #fff; }
+        .float-next-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-size: 14px; font-weight: 800; box-shadow: 0 5px 20px rgba(220,38,38,0.4); z-index: 999; display: none; transition: all 0.3s; }
+        .float-next-btn.show { display: flex; align-items: center; gap: 8px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; overflow: auto; padding: 20px; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); max-width: 90%; width: 800px; max-height: 80vh; overflow-y: auto; }
+        .close-btn { float: right; font-size: 20px; cursor: pointer; color: #dc2626; font-weight: 800; }
+        .stat-card { background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; padding: 20px; border-radius: 10px; transition: transform 0.2s; }
+        .stat-card h3 { font-size: 14px; margin-bottom: 10px; font-weight: 800; }
+        .stat-card .stat-value { font-size: 28px; font-weight: 800; }
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        @media (max-width: 768px) {
+            .analytics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            #analytics-modal .modal-content { padding: 12px !important; }
         }
-        .manage-toggle-btn:hover { background: #555; }
-        
-        .manage-btn {
-            background: #333;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
+        @media (max-width: 480px) {
+            .analytics-grid { grid-template-columns: 1fr; }
+            .stat-card h3 { font-size: 12px; }
+            .stat-card .stat-value { font-size: 20px; }
         }
-        .manage-btn:hover { background: #555; }
-
-        /* ID Copy Box Style */
-        .id-display-box {
-            background: #d1fae5;
-            border: 2px solid #059669;
-            color: #064e3b;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .id-code {
-            font-size: 1.5em;
-            font-weight: 800;
-            font-family: monospace;
-            letter-spacing: 2px;
-            background: white;
-            padding: 5px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        @media (max-width:768px){h1{font-size:1.4em}
-            .menu-grid{grid-template-columns:1fr}
-            .invoice-header{
-                flex-direction:row;
-                justify-content:space-between;
-                align-items:flex-start;
-                gap:15px;
-            }
-            .invoice-left{
-                flex:1;
-                display:flex;
-                align-items:center;
-                gap:10px;
-            }
-            .invoice-logo{
-                max-height:50px;
-                max-width:80px;
-            }
-            .invoice-header-details{
-                font-size:9px;
-            }
-            .invoice-title{
-                font-size:18px;
-                text-align:right;
-                white-space:nowrap;
-            }
-            .selected-item{flex-direction:column;gap:8px}
-        }
-        input, select, textarea { font-size: 16px !important; }
-
-        /* --- CRITICAL PRINT STYLES --- */
+        .chart-container { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        /* Invoice / PDF print improvements */
+        #invoice-to-print { font-size: 14px; line-height: 1.45; }
+        .no-break, .items-table tr, .summary-row { page-break-inside: avoid; break-inside: avoid; -webkit-column-break-inside: avoid; }
         @media print {
-            html, body {
-                margin: 0 !important;
-                padding: 0 !important;
-                font-family: Arial, sans-serif !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            #invoice-to-print {
-                width: 100% !important; /* Full width for PDF */
-                margin: 0 auto !important;
-                padding: 20px !important;
-                box-shadow: none !important;
-                background: #fff !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            #invoice-to-print, 
-            #invoice-to-print * {
-                box-sizing: border-box !important;
-                font-family: inherit !important;
-            }
-
-            #invoice-to-print .items-table {
-                width: 100% !important;
-            }
-
-            /* 1. Unbreakable Content Fixes */
-            .items-table tbody {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            
-            .invoice-summary-block {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                margin-bottom: 20px !important; /* Spacing before payment */
-            }
-
-            .payment-block {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-
-            .invoice-header,
-            .invoice-details,
-            .detail-box {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-
-            /* 2. Prominent Logo Fix */
-            .invoice-logo {
-                width: 200px !important;
-                height: auto !important;
-                max-width: none !important; /* Override any previous constraints */
-                max-height: none !important;
-            }
-
-            #invoice-to-print { box-shadow:none !important; transform:none !important; }
-            
-            /* Make text bolder for PDF */
-            #invoice-to-print * { font-weight: 600 !important; }
-            #invoice-to-print .items-table th { font-weight: 700 !important; }
-            #invoice-to-print .summary-row.grand-total { font-weight: 800 !important; font-size: 14px !important; }
-            #invoice-to-print .invoice-title { font-weight: 800 !important; }
+            #invoice-to-print * { font-weight: 800 !important; font-size: 14px !important; }
+            .no-break { page-break-inside: avoid; }
         }
-   </style>
+        /* Fullscreen modal styles for analytics & invoices */
+        #analytics-modal .modal-content, #invoices-modal .modal-content { width: 100%; height: 100%; max-width: none; border-radius: 0; padding: 20px; margin: 0; box-shadow: none; }
+        #analytics-modal, #invoices-modal { align-items: flex-start; padding-top: 70px; }
+        .back-btn { background: #059669; border: none; color: #fff; font-weight: 800; font-size: 14px; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .invoice-card { background:#fff;margin-bottom:12px;padding:12px;border-radius:8px;border:1px solid #eee;display:flex;justify-content:space-between;align-items:center;gap:12px; }
+        .invoice-card .meta { font-weight:800;color:#333; }
+        .email-form { margin-top: 15px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0284c7; }
+        .email-btn { background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 800; margin-top: 10px; }
+        .items-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 10px; border: 1px solid #e5e5e5; }
+        .items-table th { background: #dc2626; color: #fff; padding: 8px; text-align: left; font-weight: 800; }
+        .items-table td { padding: 8px; border-bottom: 1px solid #e5e5e5; font-weight: 800; }
+        .invoice-title { font-size: 28px; font-weight: 800; color: #dc2626; text-transform: uppercase; }
+        .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #e5e5e5; font-size: 10px; }
+        .summary-row.grand-total { background: #dc2626; color: #fff; padding: 10px; border-radius: 4px; font-size: 12px; font-weight: 800; margin-top: 8px; }
+        .summary-label { font-weight: 800; color: #333; }
+        .summary-value { text-align: right; color: #dc2626; font-weight: 800; }
+        @media print {
+            #invoice-to-print * { font-weight: 800 !important; }
+        }
+    </style>
 </head>
-
 <body>
     <header>
-        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:20px">
-            <div style="display:flex;align-items:center;gap:8px;flex:1">
-                <i class="fas fa-lock" style="font-size:20px;color:#dc2626"></i>
-                <div style="font-size:12px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:1px">For Staff Only</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" class="back-btn" onclick="showAnalytics(); return false;"><i class="fas fa-chart-line"></i> Analytics</button>
             </div>
-            <div style="flex:1;text-align:right">
-                <img src="cuisine-logo.jpg" alt="Cuisine Fantastique Logo" style="max-height:50px;max-width:100px;object-fit:contain">
+            <div style="text-align:right;">
+                <img src="cuisine-logo.jpg" alt="Logo" style="max-height: 50px;">
             </div>
         </div>
     </header>
 
+    <button id="float-next-btn" class="float-next-btn" onclick="scrollToNextButton()">
+        <span></span>
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
     <div class="container">
-        
-        <!-- UPDATED MANAGE SECTION WITH TOGGLE -->
-        <div class="form-section" style="background:#f0f0f0; border-left: 4px solid #333;">
-            <button class="manage-toggle-btn" onclick="toggleManageSection()">
-                <span><i class="fas fa-tasks"></i> Manage / Edit Existing Invoices</span>
+        <div class="form-section" style="background: #f0f0f0;">
+            <button class="manage-btn" onclick="toggleManageSection()" style="background: #333; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 800; width: 100%; display: flex; justify-content: space-between;">
+                <span><i class="fas fa-tasks"></i> Manage Invoices</span>
                 <i id="manage-toggle-icon" class="fas fa-chevron-down"></i>
             </button>
-            
-            <div id="manage-section-content" style="display:none; margin-top:15px; padding-top:10px; border-top:1px solid #ddd;">
+            <div id="manage-section-content" style="display: none; margin-top: 15px;">
                 <div class="form-row">
                     <div>
-                        <label>Edit Invoice (Enter Invoice Code)</label>
-                        <div style="display:flex; gap:5px;">
-                            <input type="text" id="retrieve-id" placeholder="e.g., INV-173..." style="border-color:#666;">
-                            <button class="manage-btn" onclick="retrieveInvoice()">Load to Edit</button>
-                        </div>
+                        <label>Edit Invoice</label>
+                        <input type="text" id="retrieve-id" placeholder="Invoice Code">
+                        <button onclick="retrieveInvoice()" style="margin-top:5px;background:#333;color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;font-weight:800;width:100%;">Load</button>
                     </div>
                     <div>
-                        <label>Update Payment (Code & Amount Paid)</label>
-                        <div style="display:flex; gap:5px;">
-                            <input type="text" id="payment-id" placeholder="Invoice Code" style="border-color:#666;">
-                            <input type="number" id="payment-amount" placeholder="Amount Paid" style="border-color:#666;">
-                            <button class="manage-btn" onclick="applyPayment()">Generate Updated Invoice</button>
-                        </div>
+                        <label>Mark as Paid</label>
+                        <input type="text" id="payment-id" placeholder="Invoice Code" style="margin-bottom:5px;">
+                        <input type="number" id="payment-amount" placeholder="Amount Paid (₦)">
+                        <button onclick="applyPayment()" style="margin-top:5px;background:#059669;color:#fff;border:none;padding:8px;border-radius:4px;cursor:pointer;font-weight:800;width:100%;"><i class="fas fa-check-circle"></i> Mark Paid</button>
                     </div>
                 </div>
+                <button onclick="showInvoicesList()" style="margin-top:10px;background:#333;color:#fff;border:none;padding:10px;border-radius:5px;cursor:pointer;font-weight:800;width:100%;">View All Invoices</button>
             </div>
         </div>
 
-        <div class="form-section">
+        <div class="wizard-steps">
+            <div class="step active" id="step1">1. Event Details</div>
+            <div class="step" id="step2">2. Select Items</div>
+            <div class="step" id="step3">3. Edit Prices</div>
+            <div class="step" id="step4">4. Generate</div>
+        </div>
+
+        <div class="form-section" id="step1-section">
             <div class="section-title"><i class="fas fa-calendar-alt"></i> Event Details</div>
-            <!-- Hidden inputs to track state -->
             <input type="hidden" id="current-invoice-id">
             <input type="hidden" id="current-amount-paid" value="0">
-
             <div class="form-row">
-                <div><label>Client Name</label><input type="text" id="client-name" placeholder="e.g., John Doe" required></div>
+                <div><label>Client Name</label><input type="text" id="client-name" placeholder="John Doe" required></div>
+                <div><label>Client Email</label><input type="email" id="client-email" placeholder="client@example.com"></div>
                 <div><label>Event Date</label><input type="date" id="event-date" required></div>
             </div>
             <div class="form-row">
                 <div><label>Location Type</label><select id="location-type" onchange="updateServiceChargeRate()" required>
-                    <option value="">Select Location</option>
+                    <option value="">Select</option>
                     <option value="lagos">Within Lagos</option>
                     <option value="outside">Outside Lagos</option>
                 </select></div>
-                <div><label>Location Area (Optional)</label><input type="text" id="location" placeholder="e.g., Mainland (Optional)"></div>
-                <div><label>Hall/Address</label><input type="text" id="address" placeholder="Event venue" required></div>
+                <div><label>Area (Optional)</label><input type="text" id="location" placeholder="Mainland"></div>
+                <div><label>Address</label><input type="text" id="address" placeholder="Venue" required></div>
             </div>
             <div class="form-row">
-                <div><label>Transportation Fee (₦)</label><input type="number" id="transport-fee" value="5000" min="0"></div>
-                <!-- NEW DISCOUNT INPUT -->
-                <div><label>Discount (₦) - Optional</label><input type="number" id="discount" placeholder="Enter discount amount" min="0" value="0" style="border-color:#059669"></div>
+                <div><label>Transport Fee (₦)</label><input type="number" id="transport-fee" value="5000" min="0"></div>
+                <div><label>Discount (₦)</label><input type="number" id="discount" value="0" min="0"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="nav-btn prev-btn" style="visibility:hidden;">Previous</button>
+                <button class="nav-btn next-btn" onclick="validateAndNext(1)">Next</button>
             </div>
         </div>
 
-        <div class="form-section">
-            <div class="section-title"><i class="fas fa-plus-circle"></i> Create Custom Menu</div>
-            <div class="form-row">
-                <div><label>Menu Name</label><input type="text" id="custom-menu-name" placeholder="e.g., Custom Dish"></div>
-                <div><label>Price (₦)</label><input type="number" id="custom-menu-price" min="0" value="0"></div>
-                <div><label>Quantity</label><input type="number" id="custom-menu-qty" min="1" value="1"></div>
-            </div>
-            <button class="generate-btn" onclick="addCustomMenu()" style="margin-top:10px"><i class="fas fa-check"></i> Add to Selected Items</button>
-        </div>
-
-        <div class="form-section">
+        <div class="form-section" id="step2-section" style="display:none;">
             <div class="section-title"><i class="fas fa-utensils"></i> Select Menu Items</div>
-            <div class="search-bar"><div style="position:relative"><input type="text" class="search-input" id="search-input" placeholder="Search for menu items..."><i class="fas fa-search search-icon"></i></div></div>
-            <div class="category-filter" id="category-filter"></div>
-            <div class="menu-grid" id="menu-grid"></div>
-            <div class="selected-items" id="selected-items-container" style="display:none">
-                <h3 style="color:#dc2626;margin-bottom:12px">Selected Items</h3>
+                <div class="section-title" style="margin-top:0;"><i class="fas fa-plus-circle"></i> Custom Menu</div>
+                <div class="form-row">
+                    <div><label>Name</label><input type="text" id="custom-menu-name" placeholder="Custom Item"></div>
+                    <div><label>Price (₦)</label><input type="number" id="custom-menu-price" value="0" min="0"></div>
+                    <div><label>Quantity</label><input type="number" id="custom-menu-qty" value="1" min="1"></div>
+                </div>
+                <button class="generate-btn" onclick="addCustomMenu()" style="width:auto;margin-top:10px;"><i class="fas fa-check"></i> Add Custom</button>
+                <div style="position:relative;margin-top:15px;margin-bottom:15px;">
+                    <input type="text" id="search-input" placeholder="Search menu..." style="width:100%;padding:10px 40px 10px 12px;border:2px solid #dc2626;border-radius:6px;font-weight:800;">
+                    <i class="fas fa-search" style="position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#dc2626;"></i>
+                </div>
+                <div id="category-filter" style="display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;"></div>
+                <div class="menu-grid" id="menu-grid"></div>
+            <div id="selected-items-container" style="display:none;margin-top:20px;background:#f9f9f9;padding:15px;border-radius:8px;">
+                <h3 style="color:#dc2626;margin-bottom:12px;font-weight:800;">Selected Items</h3>
                 <div id="selected-items"></div>
             </div>
-            <button class="generate-btn" onclick="generateInvoice()"><i class="fas fa-file-invoice"></i> Generate / Update Invoice</button>
-        </div>
-
-        <!-- VISIBLE ID COPY BOX -->
-        <div id="id-display-box" class="id-display-box">
-            <span><i class="fas fa-check-circle"></i> Invoice Generated Successfully!</span>
-            <span>Invoice Code (Valid for 30 Days):</span>
-            <div id="generated-id-code" class="id-code" onclick="copyInvoiceId()" title="Click to copy"></div>
-            <small style="color:#064e3b">Click the code above to copy it</small>
-        </div>
-
-        <div id="invoice-preview">
-            <div id="invoice-to-print">
-                <!-- Content will be injected here via JS -->
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="nav-btn prev-btn" onclick="goToStep(1)">Previous</button>
+                <button class="nav-btn next-btn" onclick="validateAndNext(2)">Next</button>
             </div>
-            <button class="download-btn" onclick="generatePDF()"><i class="fas fa-download"></i> Download PDF</button>
+        </div>
+
+        <div class="form-section" id="step3-section" style="display:none;">
+            <div class="section-title"><i class="fas fa-edit"></i> Edit Prices & Quantities</div>
+            <div id="edit-items-container" style="margin-top:20px;">
+                <h3 style="color:#dc2626;margin-bottom:12px;font-weight:800;">Edit Items</h3>
+                <div id="edit-items"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="nav-btn prev-btn" onclick="goToStep(2)">Previous</button>
+                <button class="nav-btn next-btn" onclick="validateAndNext(3)">Next</button>
+            </div>
+        </div>
+
+        <div class="form-section" id="step4-section" style="display:none;">
+            <div class="section-title"><i class="fas fa-eye"></i> Review</div>
+            <div id="review-event-details" style="margin-bottom:20px;font-weight:800;"></div>
+            <div id="review-selected-items" style="margin-bottom:20px;font-weight:800;"></div>
+            <button class="generate-btn" onclick="generateInvoice()">Generate Invoice</button>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="nav-btn prev-btn" onclick="goToStep(3)">Previous</button>
+                <button class="nav-btn next-btn" style="visibility:hidden;">Next</button>
+            </div>
+        </div>
+
+        <div id="id-display-box" style="display:none;background:#d1fae5;border:2px solid #059669;padding:15px;border-radius:8px;text-align:center;margin:20px 0;">
+            <span style="font-weight:800;"><i class="fas fa-check-circle"></i> Invoice Generated!</span>
+            <div id="generated-id-code" onclick="copyInvoiceId()" style="font-size:1.5em;font-weight:800;margin:10px 0;cursor:pointer;background:white;padding:10px;border-radius:4px;"></div>
+            <small style="font-weight:800;">Click code to copy</small>
+        </div>
+
+        <div id="invoice-preview" style="display:none;background:#fff;padding:15px;border-radius:10px;margin:15px auto;max-width:900px;">
+            <div id="invoice-to-print"></div>
+            <button onclick="showPasswordModal('pdf')" style="background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:800;width:100%;margin-top:15px;"><i class="fas fa-download"></i> Download PDF</button>
+            <button onclick="showPasswordModal('print')" style="background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:12px;border-radius:8px;cursor:pointer;font-weight:800;width:100%;margin-top:10px;"><i class="fas fa-print"></i> Print</button>
+            
+            <div class="email-form">
+                <h3 style="color:#0284c7;margin-bottom:10px;font-weight:800;"><i class="fas fa-envelope"></i> Email Invoice</h3>
+                <div class="form-row">
+                    <div><label style="color:#0284c7;">Email</label><input type="email" id="invoice-email" placeholder="client@example.com" style="border-color:#0284c7;"></div>
+                </div>
+                <div><label style="color:#0284c7;">Message</label><textarea id="invoice-message" rows="3" placeholder="Optional message..." style="border-color:#0284c7;font-weight:800;"></textarea></div>
+                <button class="email-btn" onclick="sendInvoiceEmail()"><i class="fas fa-paper-plane"></i> Send Email</button>
+            </div>
+        </div>
+
+        <div id="invoices-modal" class="modal">
+            <div class="modal-content">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <button class="back-btn" onclick="closeModal()"><i class="fas fa-arrow-left"></i></button>
+                    <h2 style="color:#dc2626;font-weight:800;margin:0;">Saved Invoices</h2>
+                    <div style="width:60px;"></div>
+                </div>
+                <input type="text" id="invoices-search" placeholder="Search..." style="width:100%;margin-bottom:14px;padding:10px;border:2px solid #dc2626;font-weight:800;border-radius:6px;">
+                <div id="invoices-list" style="max-height:calc(100vh - 180px);overflow:auto;padding-right:8px;"></div>
+            </div>
+        </div>
+
+        <div id="analytics-modal" class="modal">
+            <div class="modal-content">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+                    <button type="button" class="back-btn" onclick="document.getElementById('analytics-modal').style.display='none'"><i class="fas fa-arrow-left"></i> Back</button>
+                    <h2 style="color:#dc2626;margin:0;font-weight:800;font-size:20px;flex:1;text-align:center;"><i class="fas fa-chart-line"></i> Analytics</h2>
+                    <div style="width:60px;"></div>
+                </div>
+                <div class="analytics-grid">
+                    <div class="stat-card">
+                        <h3>Total Invoices</h3>
+                        <div class="stat-value" id="stat-total-invoices">0</div>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#059669,#047857);">
+                        <h3>Total Revenue</h3>
+                        <div class="stat-value" id="stat-total-revenue">₦0</div>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#0284c7,#0369a1);">
+                        <h3>Amount Paid</h3>
+                        <div class="stat-value" id="stat-total-paid">₦0</div>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+                        <h3>Pending</h3>
+                        <div class="stat-value" id="stat-pending">₦0</div>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
+                        <h3>Avg Per Invoice</h3>
+                        <div class="stat-value" id="stat-avg-value">₦0</div>
+                    </div>
+                    <div class="stat-card" style="background:linear-gradient(135deg,#ec4899,#db2777);">
+                        <h3>Payment Rate</h3>
+                        <div class="stat-value" id="stat-payment-rate">0%</div>
+                    </div>
+                </div>
+                <div class="chart-container" style="height:300px;margin-bottom:16px;">
+                    <h3 style="color:#dc2626;margin-bottom:12px;font-weight:800;font-size:16px;">Revenue Trend</h3>
+                    <canvas id="revenueChart" style="height:100%;width:100%;"></canvas>
+                </div>
+                <div style="margin-top:16px;background:#f9f9f9;padding:12px;border-radius:8px;border-left:4px solid #dc2626;">
+                    <h3 style="color:#dc2626;font-weight:800;margin-bottom:12px;font-size:15px;">Summary</h3>
+                    <div style="display:grid;grid-template-columns:1fr;gap:10px;font-size:13px;line-height:1.6;">
+                        <div><strong style="color:#333;">Most Used Item:</strong><br><span id="most-category" style="color:#059669;font-weight:800;word-break:break-word;">—</span></div>
+                        <div><strong style="color:#333;">Top Revenue Month:</strong><br><span id="top-month" style="color:#059669;font-weight:800;">—</span></div>
+                        <div><strong style="color:#333;">Items Sold:</strong> <span id="items-sold" style="color:#059669;font-weight:800;">0</span></div>
+                        <div><strong style="color:#333;">Avg Items per Invoice:</strong> <span id="avg-items" style="color:#059669;font-weight:800;">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="password-modal" class="modal">
+            <div class="modal-content" style="max-width:400px;text-align:center;">
+                <h3 style="font-weight:800;">Enter Password</h3>
+                <input type="password" id="password-input" placeholder="Password" style="width:100%;padding:10px;margin:10px 0;border:2px solid #dc2626;border-radius:5px;font-weight:800;">
+                <button onclick="validatePassword()" style="background:#dc2626;color:#fff;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;font-weight:800;">Submit</button>
+            </div>
         </div>
     </div>
 
     <script>
+        const m = [
+            // CANAPÉS - N2,000
+            { n: "Veggies Roll with Sweet Chilli Dip", p: 2000, c: "Canapés" },
+            { n: "Crispy Yam / Potato Balls with Spicy Sauce Toppings", p: 2000, c: "Canapés" },
+            { n: "Mozzarella Cheese Meatballs", p: 2000, c: "Canapés" },
+            { n: "Bruschetta with Chicken Pesto & Basil", p: 2000, c: "Canapés" },
+            { n: "Yamarita with Saucy Dip", p: 2000, c: "Canapés" },
+            { n: "Gourmet Cheese Springroll / Samosa", p: 2000, c: "Canapés" },
+            { n: "Crudites", p: 2000, c: "Canapés" },
+            { n: "Mini Vegetable Sandwiches", p: 2000, c: "Canapés" },
+            { n: "Thai Chicken Salad with Dressing", p: 2000, c: "Canapés" },
+            { n: "Spicy Prawn Mayonnaise Springroll", p: 2000, c: "Canapés" },
+            // CANAPÉS - N2,500
+            { n: "Chicken Croquettes", p: 2500, c: "Canapés" },
+            { n: "Smoked Chicken on a Toasted Bun Bed", p: 2500, c: "Canapés" },
+            { n: "Bruschetta with Mayo Shrimps", p: 2500, c: "Canapés" },
+            { n: "Meatball Trio", p: 2500, c: "Canapés" },
+            { n: "Mini Club Sandwiches", p: 2500, c: "Canapés" },
+            { n: "Gourmet Puff Puff", p: 2500, c: "Canapés" },
+            { n: "Shrimps Puff Puff with Coconut Flakes", p: 2500, c: "Canapés" },
+            { n: "Spicy Beef Skewers", p: 2500, c: "Canapés" },
+            { n: "Mini Chicken Wrap", p: 2500, c: "Canapés" },
+            { n: "Chicken Lollipop", p: 2500, c: "Canapés" },
+            { n: "Fish Balls", p: 2500, c: "Canapés" },
+            { n: "Suya Sticks", p: 2500, c: "Canapés" },
+            { n: "Cocktail Gizdodo", p: 2500, c: "Canapés" },
+            { n: "Fish Cakes with Sweet Cucumber Dip", p: 2500, c: "Canapés" },
+            { n: "Tacos (beef/chicken)", p: 2500, c: "Canapés" },
+            { n: "Spicy Honey Chicken Wings", p: 2500, c: "Canapés" },
+            { n: "Sweet Chilli Chicken Wings", p: 2500, c: "Canapés" },
+            { n: "Corn Floater", p: 2500, c: "Canapés" },
+            { n: "Shrimps Toast", p: 2500, c: "Canapés" },
+            { n: "Chicken Popcorn with Sweet Chilli Dip", p: 2500, c: "Canapés" },
+            // CANAPÉS - N3,000
+            { n: "Prawn Tempura with Dip", p: 3000, c: "Canapés" },
+            { n: "Coconut Crusted Prawn Served with Dip", p: 3000, c: "Canapés" },
+            { n: "Prawn Cocktail / Shot", p: 3000, c: "Canapés" },
+            { n: "Jerk Chicken Skewers", p: 3000, c: "Canapés" },
+            { n: "Lobster Roll", p: 3000, c: "Canapés" },
+            { n: "Crunchy Hotdog", p: 3000, c: "Canapés" },
+            // CANAPÉS - N3,500
+            { n: "Mini Gourmet Burger", p: 3500, c: "Canapés" },
+            { n: "Crispy Chicken with Slaw Sliders", p: 3500, c: "Canapés" },
+            { n: "Mini Pulled Bbq Chicken Burger with Purple Slaw", p: 3500, c: "Canapés" },
+            { n: "Cheese & Ham Toast with Hot Chocolate", p: 3500, c: "Canapés" },
+            { n: "Lamb Cutlet Served with Yoghurt Drill Dip", p: 3500, c: "Canapés" },
+            { n: "Salmon Carvier with Cream Cheese on Crostini", p: 3500, c: "Canapés" },
+            { n: "Asun Crostini", p: 3500, c: "Canapés" },
+            { n: "Buttered Garlic King Prawn with Spicy Dip", p: 3500, c: "Canapés" },
+            { n: "Oat Cake with Crispy Chicken", p: 3500, c: "Canapés" },
+            { n: "Potato Wedges with Spicy Chicken Wings", p: 3500, c: "Canapés" },
+            { n: "Ewa Agoyin with Bread & Sauce", p: 3500, c: "Canapés" },
+            // BREAKFAST
+            { n: "Breakfast Buffet (per guest) - Tea, Coffee, Juice, Snacks, Bread, Pancakes, Grilled Sausages, Fruit, Tapioca, Eggs, Macaroni, Ewa Agoyin, Baked Beans", p: 15000, c: "Breakfast" },
+            { n: "Breakfast Menu 2 (per guest) - Tea Station, Slice Bread, Sausage, Baked Beans, Scramble Eggs", p: 12000, c: "Breakfast" },
+            { n: "Breakfast Menu 3 (per guest) - 2 Snacks, 1 Protein, Tea, Boiled Plantain, Yam, Fish Stew", p: 6000, c: "Breakfast" },
+            { n: "Breakfast Menu 4 (per guest) - Executive Snacks, 1 Protein, Juice Station", p: 12000, c: "Breakfast" },
+            // SMALL CHOPS
+            { n: "Small Chops Option 1 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 4 Puff Puff, 3 Mosas", p: 2500, c: "Small Chops" },
+            { n: "Small Chops Option 2 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 4 Puff Puff, 3 Mosas, 1 Corndog", p: 2700, c: "Small Chops" },
+            { n: "Small Chops Option 3 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 4 Puff Puff, 3 Mosas, 1 Peppered Gizzard", p: 3000, c: "Small Chops" },
+            { n: "Small Chops Option 4 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 4 Puff Puff, 3 Mosas, 1 Fish in Batter", p: 3200, c: "Small Chops" },
+            { n: "Small Chops Option 5 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Prawn in Batter", p: 3800, c: "Small Chops" },
+            { n: "Small Chops Option 6 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Prawn Tempura", p: 4200, c: "Small Chops" },
+            { n: "Small Chops Option 7 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Snail", p: 4200, c: "Small Chops" },
+            { n: "Small Chops Option 8 - 1 Prawn Mayonnaise Springroll, 1 Chicken Moneybag, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Corndog", p: 4200, c: "Small Chops" },
+            { n: "Small Chops Option 9 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 1 Fish in Batter, 1 Peppered Snail, 5 Puff Puff, 4 Mosas", p: 4800, c: "Small Chops" },
+            { n: "Small Chops Option 10 - 1 Prawn Mayonnaise Springroll, 1 Chicken Moneybag, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Corndog, 1 Peppered Snail, 1 Corn On Cub", p: 5600, c: "Small Chops" },
+            { n: "Small Chops Option 11 - 1 Prawn Mayonnaise Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 5 Puff Puff, 4 Mosa, 1 Fish In Batter, 1 Peppered Gizzard, 1 Pancake Hotdog", p: 5600, c: "Small Chops" },
+            { n: "Small Chops Option 12 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Snail, 1 Prawn Tempura", p: 6100, c: "Small Chops" },
+            { n: "Small Chops Option 13 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 1 Chicken Moneybag, 1 Fantail Prawn, 1 Meatball, 1 Peppered Snail, 5 Puff Puff, 4 Mosas, 1 Corn on Cub", p: 7100, c: "Small Chops" },
+            { n: "Small Chops Option 14 - 1 Vegetable Springroll, 1 Beefy Samosa, 1 Bbq Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Gizzard, 1 Peppered Snail, 1 Fish In Batter, 1 Prawn in Batter", p: 7800, c: "Small Chops" },
+            { n: "Small Chops Option 15 - 1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, Puff Puff & Skewers", p: 8100, c: "Small Chops" },
+            { n: "Small Chops Option 16 - 1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, 1 Fish in Batter, Puff Puff & Skewers", p: 9000, c: "Small Chops" },
+            // GRILL HOUSE
+            { n: "Grilled Whole Fish with sides (yam, plantain & potatoes)", p: 9000, c: "Grill House" },
+            { n: "Titus fish & Bole", p: 4500, c: "Grill House" },
+            { n: "Mini Grilled Catfish with sides (yam, plantain & potatoes)", p: 4500, c: "Grill House" },
+            { n: "Grilled Turkey Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 6000, c: "Grill House" },
+            { n: "Sweet Chilli Chicken Wings Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4500, c: "Grill House" },
+            { n: "Spicy Jumbo Snail Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 7000, c: "Grill House" },
+            { n: "Grill Bowl (prawns, fish cutlet, turkey bite, chicken bite, suya stick, yam fries, yaggi puff kebab corn on cub)", p: 15000, c: "Grill House" },
+            { n: "Mini Grilled Croaker Fish with sides (yam, plantain & potatoes)", p: 4500, c: "Grill House" },
+            { n: "Grilled Whole Catfish with sides (yam, plantain & potatoes)", p: 9000, c: "Grill House" },
+            { n: "Grilled Chicken Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4500, c: "Grill House" },
+            { n: "Chicken Skewers Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4500, c: "Grill House" },
+            { n: "Spicy Gizzard Kebab Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4000, c: "Grill House" },
+            { n: "Jumbo Grilled Prawn Combo (medium)", p: 7500, c: "Grill House" },
+            { n: "Jumbo Grilled Prawn Combo (large)", p: 9000, c: "Grill House" },
+            // MINI FOOD
+            { n: "Jambalaya Rice served with chicken skewers / chicken lollipop", p: 4500, c: "Mini Food" },
+            { n: "Suya Spiced Alfredo with Prawns", p: 4500, c: "Mini Food" },
+            { n: "Shrimps Fried Rice served with crispy fish & veggies", p: 4500, c: "Mini Food" },
+            { n: "Ofada Rice served with orisirisi meat & egg", p: 4500, c: "Mini Food" },
+            { n: "Tomato Basil Pasta served with meatballs", p: 4500, c: "Mini Food" },
+            { n: "Alfredo Pasta served with prawns/meatballs/chicken wings", p: 4500, c: "Mini Food" },
+            { n: "Native Rice served with spicy diced goat meat", p: 4500, c: "Mini Food" },
+            { n: "Crispy Potato Wedges with Bbq Chicken", p: 4500, c: "Mini Food" },
+            { n: "Stir-Fried Spaghetti served with spicy chicken", p: 4500, c: "Mini Food" },
+            // AFTER PARTY EATS - Shawarma
+            { n: "Full Beef Sausage Shawarma", p: 3000, c: "After Party" },
+            { n: "Mini Beef Sausage Shawarma", p: 1500, c: "After Party" },
+            { n: "Full Chicken Sausage Shawarma", p: 3000, c: "After Party" },
+            { n: "Mini Chicken Sausage Shawarma", p: 1500, c: "After Party" },
+            { n: "Full Mixed Special (beef & Chicken) Shawarma", p: 3500, c: "After Party" },
+            { n: "Mini Mixed Special (beef & Chicken) Shawarma", p: 1800, c: "After Party" },
+            // AFTER PARTY - Burgers/Hotdogs
+            { n: "Regular Beef Burger", p: 4500, c: "After Party" },
+            { n: "Mini Beef Burger", p: 3500, c: "After Party" },
+            { n: "Regular Chicken Burger", p: 4500, c: "After Party" },
+            { n: "Mini Chicken Burger", p: 4500, c: "After Party" },
+            { n: "Gourmet Burger", p: 8000, c: "After Party" },
+            { n: "Regular Hotdog", p: 4000, c: "After Party" },
+            { n: "Mini Hotdog", p: 3500, c: "After Party" },
+            { n: "Gourmet Hotdog", p: 4500, c: "After Party" },
+            { n: "Fries", p: 2000, c: "After Party" },
+            // AFTER PARTY - Combos
+            { n: "Mini Burgers/Hotdogs, Fries & Chicken Wings Combo", p: 7500, c: "After Party" },
+            { n: "Mini Beef Burger/Hotdog, Fries & Chicken Kebab Combo", p: 8000, c: "After Party" },
+            { n: "Mini Beef Burger, Fries & Fish Fillet Combo", p: 8000, c: "After Party" },
+            { n: "Mini Burger, Fries & Chicken Bbq Combo", p: 8000, c: "After Party" },
+            // AFTER PARTY - Additional
+            { n: "Chicken Burger", p: 1000, c: "After Party" },
+            { n: "Gizdodo", p: 2500, c: "After Party" },
+            { n: "Puffy Cups & Chicken Wings", p: 2500, c: "After Party" },
+            { n: "Dundun & Dodo with Pomo Sauce", p: 2500, c: "After Party" },
+            { n: "Dundun & Dodo with Shawa Sauce", p: 2000, c: "After Party" },
+            { n: "Asun (a Whole Goat, feeds 40-45 guests)", p: 120000, c: "After Party" },
+            { n: "Tapioca", p: 2500, c: "After Party" },
+            { n: "Tapioca Served with Eja Yoyo & Ede", p: 5000, c: "After Party" },
+            { n: "Tapioca Served with Fantail Prawn", p: 5500, c: "After Party" },
+            { n: "Tapioca Served with Mini Akara Sliders", p: 5500, c: "After Party" },
+            // PLATTER MENU
+            { n: "Nibbles Platter - 5 Vegetable Springrolls, 5 Beefy Samosa, 5 Bbq Chicken, 5 corndogs, 20 Puff Puff, 15 Mosas, 5 Fish in Batter", p: 30000, c: "Platter" },
+            { n: "Party Platter - 5 Vegetable Springrolls, 5 Beefy Samosa, 5 Bbq Chicken, 5 Corndogs, 25 Puff Puff, 20 Mosas, 4 Spicy Sweet Potatoes Balls, 4 Peppered Gizzard, 4 Corndogs", p: 40000, c: "Platter" },
+            { n: "Treaty Platter - 2 Mini Sliders, 2 Mini Chicken Sausage Shawarma, 4 Honey Bbq Chicken Wings, 4 Spicy Chicken Wings, 4 Coconut Prawns, 4 Coconut Corn on Cub, 25 Puffpuff, 20 Mosas", p: 50000, c: "Platter" },
+            { n: "Delish Platter - 5 Vegetable Springrolls, 5 Prawn Mayonnaise Springrolls, 5 Beefy Samosa, 5 Chicken Moneybag, 5 Bbq Chicken, 5 Sweet Chilli Chicken Wings, 5 Peppered Gizzard, 5 Spicy Snails, 35 Puff Puff, 30 Mosas", p: 55000, c: "Platter" },
+            { n: "Appetizer Platter - 5 Prawn Mayonnaise Springrolls, 5 Fantail Prawns, 5 Prawn Tempura, 5 Coconut Prawns, 5 Fish Cakes, 5 Fish in Batter, 5 Fish Skewers, 5 Suya Springroll, 5 Corndogs, 25 Puff Puff, 20 Mosas", p: 60000, c: "Platter" },
+            { n: "Aso Ebi Platter - 5 Peppered Fish Cutlets, 5 Peppered Chicken Wings, 5 Peppered Beef Kebab, 5 Peppered Sausage, 5 Fantail Prawn, 5 Suya Sticks, 5 Mini Meatpie, 5 Mini Sausage Roll, 5 Corndogs, 25 Puff Puff, 20 Mosas", p: 70000, c: "Platter" },
+            { n: "Planners Platter - 2 Jumbo Chargrilled Prawns, 4 Chicken Moneybag, 2 Spicy Snails, 4 Beef Kebab, 4 Chicken Kebab, 4 Sweet Chilli Wings, 4 Buttered Corn on Cub, 25 Puff Puff, 20 Mosas", p: 75000, c: "Platter" },
+            { n: "Protein Platter - 2 Chargrilled Herb Prawns, 2 Grilled Turkey, 2 Cripsy Chicken, 2 Peppered Fish Cutlets, 2 Buttered Parsley Corn on Cub, 2 Spicy Snails, Dundun & Dodo", p: 80000, c: "Platter" },
+            { n: "Chicmeat Platter - 10 Sweet Chilli Chicken Kebabs, 10 Suya Turkey/Cutlets, 15 Sesame Meatballs, 10 Honey Bbq Chicken Wings, 10 Chicken Lollipop, 10 Buttered Parsley Corn on Cub", p: 80000, c: "Platter" },
+            { n: "Delight Platter - 2 Chargrilled Turkey, 2 Chagrilled Jumbo Prawns, 2 Jumbo Spicy Snails, 2 Mini Chicken Sausage Shawarma, 6 Puffy Kebab, 30 Mosas, 5 Peppered Catfish/Croaker Fish, 5 Grilled Spicy Turkey, 5 Chicken Wings, 5 Jumbo Prawns, 5 Stick Meats, 5 Jumbo Spicy Snails, 5 Buttered Parsley Corn on Cub", p: 90000, c: "Platter" },
+            { n: "Owanbe Platter - 15 Peppered Catfish/Croaker Fish, 10 Grilled Spicy Turkey, 10 Chicken Wings, 5 Jumbo Prawns, 10 Stick Meats, 5 Jumbo Spicy Snails, 10 Buttered Parsley Corn on Cub, 5 Prawns Mayonnaise Springrolls, 5 Vegetable Springrolls, 5 Chicken Moneybag, 10 Chicken Kebab, 2 Meatballs Kebab", p: 95000, c: "Platter" },
+            { n: "Fantastique Platter - 5 Peppered Catfish/Croaker Fish, 5 Grilled Spicy Turkey, 5 Chicken Wings, 5 Jumbo Prawns, 5 Stick Meats, 5 Jumbo Spicy Snails, 5 Buttered Parsley Corn on Cub, 5 Prawns Mayonnaise Springrolls, 5 Vegetable Springrolls, 5 Chicken Moneybag, 10 Chicken Kebab, 2 Meatballs Kebab", p: 100000, c: "Platter" },
+            { n: "ORI BOX - 15 Peppered Catfish or Croaker Fish, 10 Grilled Spicy Turkey, 10 Chicken Wings, 5 Jumbo Prawns, 10 Stick Meats, 5 Jumbo Spicy Snails, 10 Buttered Parsley Corn on Cub, 5 Prawns Mayonnaise Springrolls, 5 Vegetable Springrolls, 5 Chicken Moneybag, 10 Chicken Kebab, 2 Meatballs Kebab", p: 100000, c: "Platter" }
+        ];
+
+        // Storage Management Functions
+        function checkStorageQuota() {
+            try {
+                if (navigator.storage && navigator.storage.estimate) {
+                    navigator.storage.estimate().then(estimate => {
+                        const usage = estimate.usage || 0;
+                        const quota = estimate.quota || 5242880; // 5MB default
+                        const percentUsed = (usage / quota) * 100;
+                        
+                        if (percentUsed > 90) {
+                            console.warn(`Storage quota nearly full: ${percentUsed.toFixed(1)}% used`);
+                            // Auto-cleanup old invoices if over 80%
+                            if (percentUsed > 80) {
+                                cleanupOldInvoices();
+                            }
+                        }
+                    }).catch(err => console.error('Storage estimate error:', err));
+                }
+            } catch (e) {
+                console.warn('Storage quota check unavailable');
+            }
+        }
+
+        function cleanupOldInvoices() {
+            try {
+                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+                const keys = Object.keys(localStorage).filter(k => k && k.startsWith('INV-'));
+                let cleaned = 0;
+                
+                keys.forEach(key => {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (Date.now() - (data?.timestamp || 0) > THIRTY_DAYS_MS) {
+                            localStorage.removeItem(key);
+                            cleaned++;
+                        }
+                    } catch (e) {
+                        // Remove corrupted entries
+                        localStorage.removeItem(key);
+                        cleaned++;
+                    }
+                });
+                
+                if (cleaned > 0) {
+                    console.log(`Cleaned up ${cleaned} expired invoices`);
+                }
+            } catch (e) {
+                console.error('Cleanup error:', e);
+            }
+        }
+
+        function backupInvoices() {
+            try {
+                const invoices = {};
+                Object.keys(localStorage).forEach(key => {
+                    if (key && key.startsWith('INV-')) {
+                        try {
+                            invoices[key] = JSON.parse(localStorage.getItem(key));
+                        } catch (e) {
+                            console.warn(`Skipping corrupted invoice: ${key}`);
+                        }
+                    }
+                });
+                
+                if (Object.keys(invoices).length === 0) {
+                    alert('No invoices to backup');
+                    return;
+                }
+                
+                const backup = {
+                    version: '1.0',
+                    created: new Date().toISOString(),
+                    invoices: invoices
+                };
+                
+                const dataStr = JSON.stringify(backup, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `invoice-backup-${Date.now()}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                alert(`✅ Backed up ${Object.keys(invoices).length} invoices`);
+            } catch (e) {
+                console.error('Backup error:', e);
+                alert('Error creating backup');
+            }
+        }
+
+        function restoreInvoices(file) {
+            try {
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const backup = JSON.parse(e.target.result);
+                        if (!backup.invoices || typeof backup.invoices !== 'object') {
+                            alert('Invalid backup file format');
+                            return;
+                        }
+                        
+                        let restored = 0;
+                        Object.entries(backup.invoices).forEach(([key, data]) => {
+                            if (key && key.startsWith('INV-') && data && typeof data === 'object') {
+                                localStorage.setItem(key, JSON.stringify(data));
+                                restored++;
+                            }
+                        });
+                        
+                        alert(`✅ Restored ${restored} invoices`);
+                    } catch (parseError) {
+                        console.error('Restore parse error:', parseError);
+                        alert('Error reading backup file');
+                    }
+                };
+                reader.readAsText(file);
+            } catch (e) {
+                console.error('Restore error:', e);
+                alert('Error restoring backup');
+            }
+        }
         
-const m = [
-  // CANAPÉS - N2,000 per item
-  { n: "Veggies Roll with Sweet Chilli Dip", p: 2000, c: "Canapés" },
-  { n: "Crispy Yam / Potato Balls with Spicy Sauce Toppings", p: 2000, c: "Canapés" },
-  { n: "Mozzarella Cheese Meatballs", p: 2000, c: "Canapés" },
-  { n: "Bruschetta with Chicken Pesto & Basil", p: 2000, c: "Canapés" },
-  { n: "Yamarita with Saucy Dip", p: 2000, c: "Canapés" },
-  { n: "Gourmet Cheese Springroll / Samosa", p: 2000, c: "Canapés" },
-  { n: "Crudites", p: 2000, c: "Canapés" },
-  { n: "Mini Vegetable Sandwiches", p: 2000, c: "Canapés" },
-  { n: "Thai Chicken Salad with Dressing", p: 2000, c: "Canapés" },
-  { n: "Spicy Prawn Mayonnaise Springroll", p: 2000, c: "Canapés" },
+        let s = {}, f = 'All', serviceChargeRate = 15, currentStep = 1, passwordAction = '';
 
-  // CANAPÉS - N2,500 per item
-  { n: "Chicken Croquettes", p: 2500, c: "Canapés" },
-  { n: "Smoked Chicken on a Toasted Bun Bed", p: 2500, c: "Canapés" },
-  { n: "Bruschetta with Mayo Shrimps", p: 2500, c: "Canapés" },
-  { n: "Meatball Trio", p: 2500, c: "Canapés" },
-  { n: "Mini Club Sandwiches", p: 2500, c: "Canapés" },
-  { n: "Gourmet Puff Puff", p: 2500, c: "Canapés" },
-  { n: "Shrimps Puff Puff with Coconut Flakes", p: 2500, c: "Canapés" },
-  { n: "Spicy Beef Skewers", p: 2500, c: "Canapés" },
-  { n: "Mini Chicken Wrap", p: 2500, c: "Canapés" },
-  { n: "Chicken Lollipop", p: 2500, c: "Canapés" },
-  { n: "Fish Balls", p: 2500, c: "Canapés" },
-  { n: "Suya Sticks", p: 2500, c: "Canapés" },
-  { n: "Cocktail Gizdodo", p: 2500, c: "Canapés" },
-  { n: "Fish Cakes with a Sweet Cucumber Dips", p: 2500, c: "Canapés" },
-  { n: "Tacos (beef/chicken)", p: 2500, c: "Canapés" },
-  { n: "Spicy Honey Chicken Wings", p: 2500, c: "Canapés" },
-  { n: "Sweet Chilli Chicken Wings", p: 2500, c: "Canapés" },
-  { n: "Corn Floater", p: 2500, c: "Canapés" },
-  { n: "Shrimps Toast", p: 2500, c: "Canapés" },
-  { n: "Chicken Popcorn with Sweet Chilli Dip", p: 2500, c: "Canapés" },
+        function init() {
+            try {
+                if (!m || !Array.isArray(m) || m.length === 0) {
+                    console.error('Menu data not loaded');
+                    alert('Error: Menu data not available');
+                    return;
+                }
+                
+                const filterEl = document.getElementById('category-filter');
+                if (!filterEl) return;
+                
+                const cs = ['All', ...new Set(m.map(i => (i && i.c) ? i.c : null).filter(Boolean))];
+                filterEl.innerHTML = cs.map(c => {
+                    const safeCategory = c.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    return `<button class="filter-btn ${c === 'All' ? 'active' : ''}" onclick="filterCategory('${safeCategory}', this)">${c}</button>`;
+                }).join('');
+                
+                renderMenuItems('');
+                
+                // Add debounced search to prevent excessive renders with 190+ items
+                const debouncedSearch = debounce((value) => {
+                    try {
+                        renderMenuItems(value);
+                    } catch (e) {
+                        console.error('Search render error:', e);
+                    }
+                }, 300); // Wait 300ms after user stops typing
+                
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('input', e => {
+                        debouncedSearch(e.target.value);
+                    });
+                }
+                
+                const clientEmail = document.getElementById('client-email');
+                if (clientEmail) {
+                    clientEmail.addEventListener('change', function() {
+                        const invoiceEmail = document.getElementById('invoice-email');
+                        if (invoiceEmail) {
+                            invoiceEmail.value = this.value;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Init error:', e);
+                alert('Error initializing application');
+            }
+        }
 
-  // CANAPÉS - N3,000 per item
-  { n: "Prawn Tempura with Dip", p: 3000, c: "Canapés" },
-  { n: "Coconut Crusted Prawn Served with Dip", p: 3000, c: "Canapés" },
-  { n: "Prawn Cocktail / Shot", p: 3000, c: "Canapés" },
-  { n: "Jerk Chicken Skewers", p: 3000, c: "Canapés" },
-  { n: "Lobster Roll", p: 3000, c: "Canapés" },
-  { n: "Crunchy Hotdog", p: 3000, c: "Canapés" },
+        function updateServiceChargeRate() {
+            try {
+                const locTypeEl = document.getElementById('location-type');
+                if (!locTypeEl) return;
+                
+                const locationType = locTypeEl.value;
+                serviceChargeRate = (locationType === 'outside') ? 20 : 15;
+            } catch (e) {
+                console.error('Update service charge error:', e);
+                serviceChargeRate = 15; // Default fallback
+            }
+        }
 
-  // CANAPÉS - N3,500 per item
-  { n: "Mini Gourmet Burger", p: 3500, c: "Canapés" },
-  { n: "Crispy Chicken with Slaw Sliders", p: 3500, c: "Canapés" },
-  { n: "Mini Pulled Bbq Chicken Burger with Purple Slaw", p: 3500, c: "Canapés" },
-  { n: "Cheese & Ham Toast with Hot Chocolate", p: 3500, c: "Canapés" },
-  { n: "Lamb Cutlet Served with Yoghurt Drill Dip", p: 3500, c: "Canapés" },
-  { n: "Salmon Carvier with Cream Cheese on Crostini", p: 3500, c: "Canapés" },
-  { n: "Asun Crostini", p: 3500, c: "Canapés" },
-  { n: "Buttered Garlic King Prawn with Spicy Dip", p: 3500, c: "Canapés" },
-  { n: "Oat Cake with Crispy Chicken", p: 3500, c: "Canapés" },
-  { n: "Potato Wedges with Spicy Chicken Wings", p: 3500, c: "Canapés" },
-  { n: "Ewa Agoyin with Bread & Sauce", p: 3500, c: "Canapés" },
+        function filterCategory(c, btnEl) {
+            f = c;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+            renderMenuItems(document.getElementById('search-input').value || '');
+        }
 
-  // BREAKFAST MENU (per guest)
-  { n: "Breakfast - Buffet Style (per guest): Includes Tea (Green/Black/Flavored), Coffee, Juice, Mini Snacks (Meat Pie, Sausage Roll, Doughnut), Bread Roll, Cup Cakes, Sandwiches, Pancakes, Grilled Sausages, Spicy Chicken Wings, Fruit Platter, Tapioca, Boiled Yam, Plantain, Sweet Potatoes, Titus Sauce, Various Egg Preparations, Macaroni, Ewa Agoyin, Baked Beans, Sliced Bread, Irish Potato", p: 15000, c: "Breakfast" },
-  { n: "Breakfast - Menu 2 (per guest): Includes Tea Station, Slice Bread, Sausage, Baked Beans, Scrambled Eggs", p: 12000, c: "Breakfast" },
-  { n: "Breakfast - Menu 3 (per guest): Includes 2 Snacks, 1 Protein, Tea Station, Boiled Plantain, Boiled Yam, Fish Stew, Sauteed Potatoes, Nigerian Egg Sauce", p: 6000, c: "Breakfast" },
-  { n: "Breakfast - Menu 4 (per guest): Executive Snacks (Mini Croissant, Mini Pain Au Chocolat, Muffins, Mini Sliders, Waffles, Puff Pastry Meat Pie, Puff Pastry Sausage, Sandwiches), 1 Protein, Juice Station", p: 12000, c: "Breakfast" },
+        function renderMenuItems(t = '') {
+            const g = document.getElementById('menu-grid');
+            if (!g) return; // Safety check
+            
+            try {
+                let items = f === 'All' ? m : m.filter(i => i && i.c === f);
+                if (t) {
+                    t = String(t).trim().toLowerCase(); // Sanitize input
+                    items = items.filter(i => 
+                        (i && i.n && i.n.toLowerCase().includes(t)) || 
+                        (i && i.c && i.c.toLowerCase().includes(t))
+                    );
+                }
+                
+                if (items.length === 0) {
+                    g.innerHTML = '<div style="text-align:center;padding:30px;color:#666;font-weight:800;"><i class="fas fa-search" style="font-size:40px;margin-bottom:8px"></i><p>No items found</p></div>';
+                    return;
+                }
+                
+                g.innerHTML = items.map(i => {
+                    if (!i || !i.n || typeof i.p !== 'number') return ''; // Skip invalid items
+                    const safeName = i.n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const safeCategory = (i.c || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    return `<div class="menu-item-card ${s[i.n] ? 'selected' : ''}" onclick="toggleItem('${safeName}', ${i.p})">
+                        <div class="item-category">${safeCategory}</div>
+                        <div class="item-name">${i.n}</div>
+                        <div class="item-price">₦${i.p.toLocaleString()}</div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Menu render error:', e);
+                alert('Error loading menu items');
+            }
+        }
 
-  // SMALL CHOPS (per guest)
-  { n: "Small Chops - Option 1: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas", p: 2500, c: "Small Chops" },
-  { n: "Small Chops - Option 2: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Corndog", p: 2700, c: "Small Chops" },
-  { n: "Small Chops - Option 3: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Peppered Gizzard", p: 3000, c: "Small Chops" },
-  { n: "Small Chops - Option 4: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Fish in Batter", p: 3200, c: "Small Chops" },
-  { n: "Small Chops - Option 5: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Prawn in Batter", p: 3800, c: "Small Chops" },
-  { n: "Small Chops - Option 6: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Prawn Tempura", p: 4200, c: "Small Chops" },
-  { n: "Small Chops - Option 7: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Snail", p: 4200, c: "Small Chops" },
-  { n: "Small Chops - Option 8: 1 Prawn Mayonnaise Springroll, 1 Chicken Moneybag, 1 BBQ Chicken or Chicken Wings, 5 Puff Puff, 4 Mosas, 1 Corndog", p: 4200, c: "Small Chops" },
-  { n: "Small Chops - Option 9: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 1 Fish in Batter, 1 Peppered Snail, 5 Puff Puff, 4 Mosas", p: 4800, c: "Small Chops" },
-  { n: "Small Chops - Option 10: 1 Prawn Mayonnaise Springroll, 1 Chicken Moneybag, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Corndog, 1 Peppered Snail, 1 Corn On Cub", p: 5600, c: "Small Chops" },
-  { n: "Small Chops - Option 11: 1 Prawn Mayonnaise Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosa, 1 Fish In Batter, 1 Peppered Gizzard, 1 Pancake Hotdog", p: 5600, c: "Small Chops" },
-  { n: "Small Chops - Option 12: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Snail, 1 Prawn Tempura", p: 6100, c: "Small Chops" },
-  { n: "Small Chops - Option 13: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 1 Chicken Moneybag, 1 Fantail Prawn, 1 Meatball, 1 Peppered Snail, 5 Puff Puff, 4 Mosas, 1 Corn on Cub", p: 7100, c: "Small Chops" },
-  { n: "Small Chops - Option 14: 1 Vegetable Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Gizzard, 1 Peppered Snail, 1 Fish In Batter, 1 Prawn in Batter", p: 7800, c: "Small Chops" },
-  { n: "Small Chops - Option 15: 1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, Puff Puff & Skewers", p: 8100, c: "Small Chops" },
-  { n: "Small Chops - Option 16: 1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, 1 Fish in Batter, Puff Puff & Skewers", p: 9000, c: "Small Chops" },
+        function toggleItem(n, p) {
+            try {
+                if (!n || typeof p !== 'number' || p <= 0) {
+                    console.error('Invalid item data', {n, p});
+                    return;
+                }
+                
+                if (s[n]) {
+                    delete s[n];
+                } else {
+                    s[n] = { p: Math.max(0, parseFloat(p)), q: 1 };
+                }
+                
+                const searchInput = document.getElementById('search-input');
+                renderMenuItems(searchInput ? (searchInput.value || '') : '');
+                renderSelectedItems();
+                updateFloatingButton();
+            } catch (e) {
+                console.error('Toggle item error:', e);
+            }
+        }
 
-  // GRILL HOUSE
-  { n: "Grilled Whole Fish with sides (yam, plantain & potatoes)", p: 9000, c: "Grill House" },
-  { n: "Titus fish & Bole", p: 4500, c: "Grill House" },
-  { n: "Mini Grilled Catfish with sides (yam, plantain & potatoes)", p: 4500, c: "Grill House" },
-  { n: "Grilled Turkey Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 6000, c: "Grill House" },
-  { n: "Sweet Chilli Chicken Wings Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4500, c: "Grill House" },
-  { n: "Spicy Jumbo Snail Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 7000, c: "Grill House" },
-  { n: "Grill Bowl", p: 15000, c: "Grill House" },
-  { n: "Mini Grilled Croaker Fish with sides (yam, plantain & potatoes)", p: 4500, c: "Grill House" },
-  { n: "Grilled Whole Catfish with sides (yam, plantain & potatoes)", p: 9000, c: "Grill House" },
-  { n: "Grilled Chicken Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4500, c: "Grill House" },
-  { n: "Chicken Skewers Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4500, c: "Grill House" },
-  { n: "Spicy Gizzard Kebab Combo (yam, plantain, potatoes, sausage & corn on cub)", p: 4000, c: "Grill House" },
-  { n: "Jumbo Grilled Prawn Combo (medium)", p: 7500, c: "Grill House" },
-  { n: "Jumbo Grilled Prawn Combo (large)", p: 9000, c: "Grill House" },
+        function addCustomMenu() {
+            const name = document.getElementById('custom-menu-name').value.trim();
+            const price = parseFloat(document.getElementById('custom-menu-price').value) || 0;
+            const qty = parseInt(document.getElementById('custom-menu-qty').value) || 1;
+            if (!name) { alert('Please enter a menu name'); return; }
+            if (price <= 0) { alert('Please enter a valid price'); return; }
+            if (qty < 1) { alert('Quantity must be at least 1'); return; }
+            s[name] = { p: price, q: qty };
+            document.getElementById('custom-menu-name').value = '';
+            document.getElementById('custom-menu-price').value = '0';
+            document.getElementById('custom-menu-qty').value = '1';
+            renderSelectedItems();
+            updateFloatingButton();
+        }
 
-  // MINI FOOD
-  { n: "Jambalaya Rice served with chicken skewers / chicken lollipop", p: 4500, c: "Mini Food" },
-  { n: "Suya Spiced Alfredo with Prawns", p: 4500, c: "Mini Food" },
-  { n: "Shrimps Fried Rice served with crispy fish & veggies", p: 4500, c: "Mini Food" },
-  { n: "Ofada Rice served with orisirisi meat & egg", p: 4500, c: "Mini Food" },
-  { n: "Tomato Basil Pasta served with meatballs", p: 4500, c: "Mini Food" },
-  { n: "Alfredo Pasta served with prawns/meatballs/chicken wings", p: 4500, c: "Mini Food" },
-  { n: "Native Rice served with spicy diced goat meat", p: 4500, c: "Mini Food" },
-  { n: "Crispy Potato Wedges with Bbq Chicken", p: 4500, c: "Mini Food" },
-  { n: "Stir-Fried Spaghetti served with spicy chicken", p: 4500, c: "Mini Food" },
+        function renderSelectedItems() {
+            try {
+                const c = document.getElementById('selected-items-container');
+                const d = document.getElementById('selected-items');
+                if (!c || !d) return;
+                
+                const items = Object.keys(s);
+                if (items.length === 0) { 
+                    c.style.display = 'none'; 
+                    return; 
+                }
+                
+                c.style.display = 'block';
+                d.innerHTML = items.map(n => {
+                    if (!s[n] || typeof s[n].p !== 'number' || typeof s[n].q !== 'number') return '';
+                    const safeName = n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const displayName = n.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;border-radius:5px;margin-bottom:8px;">
+                        <div style="flex:1;"><strong style="font-weight:800;">${displayName}</strong><br><small style="color:#dc2626;font-weight:800;">₦${s[n].p.toLocaleString()}</small></div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <label style="margin:0;font-size:11px;font-weight:800;">Qty:</label>
+                            <span style="font-weight:800;">${s[n].q}</span>
+                            <button onclick="removeItem('${safeName}');" style="background:#dc2626;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:800;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Render selected items error:', e);
+            }
+        }
 
-  // AFTER PARTY EATS
-  { n: "Full Beef Sausage Shawarma", p: 3000, c: "After Party" },
-  { n: "Mini Beef Sausage Shawarma", p: 1500, c: "After Party" },
-  { n: "Full Chicken Sausage Shawarma", p: 3000, c: "After Party" },
-  { n: "Mini Chicken Sausage Shawarma", p: 1500, c: "After Party" },
-  { n: "Full Mixed Special (beef & Chicken) Shawarma", p: 3500, c: "After Party" },
-  { n: "Mini Mixed Special (beef & Chicken) Shawarma", p: 1800, c: "After Party" },
-  { n: "Regular Beef Burger", p: 4500, c: "After Party" },
-  { n: "Mini Beef Burger", p: 3500, c: "After Party" },
-  { n: "Regular Chicken Burger", p: 4500, c: "After Party" },
-  { n: "Mini Chicken Burger", p: 4500, c: "After Party" },
-  { n: "Gourmet Burger", p: 8000, c: "After Party" },
-  { n: "Regular Hotdog", p: 4000, c: "After Party" },
-  { n: "Mini Hotdog", p: 3500, c: "After Party" },
-  { n: "Gourmet Hotdog", p: 4500, c: "After Party" },
-  { n: "Fries", p: 2000, c: "After Party" },
-  { n: "Mini Burgers/Hotdogs, Fries & Chicken Wings (Combo)", p: 7500, c: "After Party" },
-  { n: "Mini Beef Burger/Hotdog, Fries & Chicken Kebab (Combo)", p: 8000, c: "After Party" },
-  { n: "Mini Beef Burger, Fries & Fish Fillet (Combo)", p: 8000, c: "After Party" },
-  { n: "Mini Burger, Fries & Chicken Bbq (Combo)", p: 8000, c: "After Party" },
-  { n: "Chicken Burger (Additional)", p: 1000, c: "After Party" },
-  { n: "Gizdodo", p: 2500, c: "After Party" },
-  { n: "Puffy Cups & Chicken Wings", p: 2500, c: "After Party" },
-  { n: "Dundun & Dodo with Pomo Sauce", p: 2500, c: "After Party" },
-  { n: "Dundun & Dodo with Shawa Sauce", p: 2000, c: "After Party" },
-  { n: "Asun (Whole Goat - feeds 40-45 guests)", p: 120000, c: "After Party" },
-  { n: "Tapioca", p: 2500, c: "After Party" },
-  { n: "Tapioca Served with Eja Yoyo & Ede", p: 5000, c: "After Party" },
-  { n: "Tapioca Served with Fantail Prawn", p: 5500, c: "After Party" },
-  { n: "Tapioca Served with Mini Akara Sliders", p: 5500, c: "After Party" },
+        function renderEditItems() {
+            try {
+                const c = document.getElementById('edit-items-container');
+                const d = document.getElementById('edit-items');
+                if (!c || !d) return;
+                
+                const items = Object.keys(s);
+                if (items.length === 0) { 
+                    c.innerHTML = '<p style="font-weight:800;">No items selected.</p>'; 
+                    return; 
+                }
+                
+                d.innerHTML = items.map(n => {
+                    if (!s[n] || typeof s[n].p !== 'number' || typeof s[n].q !== 'number') return '';
+                    const safeName = n.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const displayName = n.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;border-radius:5px;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
+                        <div style="flex:1;min-width:150px;"><strong style="font-weight:800;">${displayName}</strong></div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <label style="margin:0;font-size:11px;font-weight:800;">Price:</label>
+                            <input type="number" value="${s[n].p}" min="0" onchange="updatePrice('${safeName}', this.value)" style="width:100px;padding:5px;border:1px solid #dc2626;border-radius:4px;font-weight:800;">
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <label style="margin:0;font-size:11px;font-weight:800;">Qty:</label>
+                            <input type="number" value="${s[n].q}" min="1" onchange="updateQty('${safeName}', this.value)" style="width:60px;padding:5px;text-align:center;border:1px solid #dc2626;border-radius:4px;font-weight:800;">
+                        </div>
+                        <button onclick="removeItem('${safeName}');" style="background:#dc2626;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:800;"><i class="fas fa-trash"></i></button>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Render edit items error:', e);
+            }
+        }
 
-  // PLATTER MENU
-  { n: "Nibbles Platter", p: 30000, c: "Platter" },
-  { n: "Party Platter", p: 40000, c: "Platter" },
-  { n: "Treaty Platter", p: 50000, c: "Platter" },
-  { n: "Delish Platter", p: 55000, c: "Platter" },
-  { n: "Appetizer Platter", p: 60000, c: "Platter" },
-  { n: "Aso Ebi Platter", p: 70000, c: "Platter" },
-  { n: "Planners Platter", p: 75000, c: "Platter" },
-  { n: "Protein Platter", p: 80000, c: "Platter" },
-  { n: "Chicmeat Platter", p: 80000, c: "Platter" },
-  { n: "Delight Platter", p: 90000, c: "Platter" },
-  { n: "Owanbe Platter", p: 95000, c: "Platter" },
-  { n: "Fantastique Platter", p: 100000, c: "Platter" },
-  { n: "ORI BOX", p: 100000, c: "Platter" }
-];
-let s={},f='All',serviceChargeRate=15;
+        function updatePrice(n, p) {
+            try {
+                if (!n || !s[n]) return;
+                const price = parseFloat(p);
+                if (isNaN(price) || price < 0 || price > 999999999) { 
+                    alert('Invalid price: must be between 0 and 999,999,999'); 
+                    return; 
+                }
+                s[n].p = Math.max(0, parseFloat(price.toFixed(2))); // Prevent floating point errors
+                renderEditItems();
+            } catch (e) {
+                console.error('Update price error:', e);
+                alert('Error updating price');
+            }
+        }
 
-function init(){
-    const cs=['All',...new Set(m.map(i=>i.c))];
-    document.getElementById('category-filter').innerHTML = cs.map(c=>
-        `<button class="filter-btn ${c==='All'?'active':''}" data-cat="${c}" onclick="filterCategory('${c}', this)">${c}</button>`
-    ).join('');
-    renderMenuItems(document.getElementById('search-input').value || '');
-    document.getElementById('search-input').addEventListener('input',e=>renderMenuItems(e.target.value));
-}
+        function updateQty(n, q) {
+            try {
+                if (!n || !s[n]) return;
+                const qty = parseInt(q, 10); // Specify radix for safety
+                if (isNaN(qty) || qty < 1 || qty > 999) { 
+                    alert('Quantity must be between 1 and 999'); 
+                    return; 
+                }
+                s[n].q = qty;
+                renderEditItems();
+            } catch (e) {
+                console.error('Update qty error:', e);
+                alert('Error updating quantity');
+            }
+        }
 
-function updateServiceChargeRate(){
-    const locationType = document.getElementById('location-type').value;
-    serviceChargeRate = locationType === 'outside' ? 20 : 15;
-}
+        function removeItem(n) {
+            try {
+                if (!n || !s[n]) return;
+                delete s[n];
+                
+                const searchInput = document.getElementById('search-input');
+                renderMenuItems(searchInput ? (searchInput.value || '') : '');
+                renderSelectedItems();
+                renderEditItems();
+                updateFloatingButton();
+            } catch (e) {
+                console.error('Remove item error:', e);
+            }
+        }
 
-function filterCategory(c, btnEl){
-    f = c;
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    if(btnEl && btnEl.classList) btnEl.classList.add('active');
-    else {
-        const found = document.querySelector(`.filter-btn[data-cat="${c}"]`);
-        if(found) found.classList.add('active');
-    }
-    renderMenuItems(document.getElementById('search-input').value || '');
-}
+        function goToStep(step) {
+            try {
+                if (typeof step !== 'number' || step < 1 || step > 5) {
+                    console.error('Invalid step:', step);
+                    return;
+                }
+                
+                currentStep = step;
+                const steps = document.querySelectorAll('[id^="step"]');
+                if (!steps.length) return;
+                
+                steps.forEach(el => {
+                    el.classList.remove('active', 'completed');
+                });
+                
+                for (let i = 1; i < step; i++) {
+                    const el = document.getElementById(`step${i}`);
+                    if (el) el.classList.add('completed');
+                }
+                
+                const currentStepEl = document.getElementById(`step${step}`);
+                if (currentStepEl) currentStepEl.classList.add('active');
+                
+                document.querySelectorAll('[id^="step"][id$="-section"]').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                const sectionEl = document.getElementById(`step${step}-section`);
+                if (sectionEl) sectionEl.style.display = 'block';
+                
+                if (step === 3) renderEditItems();
+                if (step === 4) renderReview();
+                updateFloatingButton();
+            } catch (e) {
+                console.error('Go to step error:', e);
+            }
+        }
 
-function renderMenuItems(t=''){
-    const g=document.getElementById('menu-grid');
-    let items = f==='All' ? m : m.filter(i=>i.c===f);
-    if(t) items = items.filter(i=>i.n.toLowerCase().includes(t.toLowerCase()) || i.c.toLowerCase().includes(t.toLowerCase()));
-    if(items.length===0){
-        g.innerHTML = '<div class="empty-state"><i class="fas fa-search" style="font-size:40px;color:#ccc;margin-bottom:8px"></i><p>No items found</p></div>';
-        return;
-    }
-    g.innerHTML = items.map(i=>`<div class="menu-item-card ${s[i.n]?'selected':''}" onclick="toggleItem('${i.n.replace(/'/g,"\\'")}',${i.p})"><div class="item-category">${i.c}</div><div class="item-name">${i.n}</div><div class="item-price">₦${i.p.toLocaleString()}</div></div>`).join('');
-}
+        function validateAndNext(step) {
+            try {
+                let valid = true;
+                
+                if (step === 1) {
+                    ['client-name', 'event-date', 'location-type', 'address'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (!el || !el.value.trim()) { 
+                            valid = false; 
+                            if (el) el.style.borderColor = '#dc2626';
+                        } else if (el) {
+                            el.style.borderColor = '';
+                        }
+                    });
+                    
+                    const transportEl = document.getElementById('transport-fee');
+                    const discountEl = document.getElementById('discount');
+                    const transport = parseFloat(transportEl ? transportEl.value : 0);
+                    const discount = parseFloat(discountEl ? discountEl.value : 0);
+                    
+                    if (isNaN(transport) || transport < 0 || transport > 999999999) { 
+                        valid = false; 
+                        alert('Invalid transportation fee (0-999,999,999)'); 
+                    }
+                    if (isNaN(discount) || discount < 0 || discount > 999999999) { 
+                        valid = false; 
+                        alert('Invalid discount (0-999,999,999)'); 
+                    }
+                    if (!valid) { 
+                        alert('Please fill all required fields correctly.'); 
+                        return; 
+                    }
+                } else if (step === 2 || step === 3) {
+                    if (!s || Object.keys(s).length === 0) { 
+                        alert('Please select at least one menu item.'); 
+                        return; 
+                    }
+                }
+                
+                goToStep(step + 1);
+            } catch (e) {
+                console.error('Validation error:', e);
+                alert('Error validating form');
+            }
+        }
 
-function toggleItem(n,p){ s[n] ? delete s[n] : s[n] = {p,q:1}; renderMenuItems(document.getElementById('search-input').value || ''); renderSelectedItems(); }
+        function renderReview() {
+            try {
+                const client = document.getElementById('client-name')?.value || '';
+                const date = document.getElementById('event-date')?.value || '';
+                const locTypeEl = document.getElementById('location-type');
+                const locType = locTypeEl ? (locTypeEl.options[locTypeEl.selectedIndex]?.text || 'N/A') : 'N/A';
+                const locArea = document.getElementById('location')?.value || 'N/A';
+                const addr = document.getElementById('address')?.value || '';
+                const transport = document.getElementById('transport-fee')?.value || '0';
+                const discount = document.getElementById('discount')?.value || '0';
+                
+                // Sanitize and escape HTML for security
+                const escapeHtml = (str) => String(str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-function addCustomMenu(){
-    const name = document.getElementById('custom-menu-name').value.trim();
-    const price = parseFloat(document.getElementById('custom-menu-price').value) || 0;
-    const qty = parseInt(document.getElementById('custom-menu-qty').value) || 1;
-    
-    if(!name){ alert('Please enter a menu name'); return; }
-    if(price <= 0){ alert('Please enter a valid price'); return; }
-    
-    s[name] = {p: price, q: qty};
-    
-    document.getElementById('custom-menu-name').value = '';
-    document.getElementById('custom-menu-price').value = '0';
-    document.getElementById('custom-menu-qty').value = '1';
-    
-    renderSelectedItems();
-}
+                const reviewEl = document.getElementById('review-event-details');
+                if (reviewEl) {
+                    reviewEl.innerHTML = `
+                        <h4 style="font-weight:800;">Event Details:</h4>
+                        <p><strong>Client:</strong> ${escapeHtml(client)}</p>
+                        <p><strong>Date:</strong> ${escapeHtml(date)}</p>
+                        <p><strong>Location Type:</strong> ${escapeHtml(locType)}</p>
+                        <p><strong>Area:</strong> ${escapeHtml(locArea)}</p>
+                        <p><strong>Address:</strong> ${escapeHtml(addr)}</p>
+                        <p><strong>Transport:</strong> ₦${parseFloat(transport).toLocaleString()}</p>
+                        <p><strong>Discount:</strong> ₦${parseFloat(discount).toLocaleString()}</p>
+                    `;
+                }
 
-function renderSelectedItems(){
-    const c=document.getElementById('selected-items-container'), d=document.getElementById('selected-items'), items=Object.keys(s);
-    if(items.length===0){ c.style.display='none'; return; }
-    c.style.display='block';
-    d.innerHTML = items.map(n=>`<div class="selected-item"><div class="selected-item-info"><strong>${n}</strong><br><small style="color:#dc2626">₦<input type="number" style="width:80px;padding:2px;border:1px solid #dc2626;border-radius:3px;font-size:11px;font-weight:600;color:#dc2626" value="${s[n].p}" onchange="updatePrice('${n.replace(/'/g,"\\'")}',this.value)" min="0"></small></div><div style="display:flex;align-items:center;gap:8px"><label style="margin:0;font-size:11px">Qty:</label><input type="number" class="qty-input" value="${s[n].q}" min="1" onchange="updateQty('${n.replace(/'/g,"\\'")}',this.value)"><button class="remove-btn" onclick="removeItem('${n.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></div></div>`).join('');
-}
+                const itemsHtml = Object.keys(s).map(n => {
+                    if (!s[n] || typeof s[n].p !== 'number') return '';
+                    return `<p>${escapeHtml(n)} - Qty: ${s[n].q} - ₦${s[n].p.toLocaleString()}</p>`;
+                }).join('');
+                
+                const itemsEl = document.getElementById('review-selected-items');
+                if (itemsEl) {
+                    itemsEl.innerHTML = `<h4 style="font-weight:800;">Selected Items:</h4>${itemsHtml}`;
+                }
+            } catch (e) {
+                console.error('Render review error:', e);
+            }
+        }
 
-function updatePrice(n,p){
-    s[n].p = parseFloat(p) || 0;
-    renderSelectedItems();
-}
+        function toggleManageSection() {
+            const section = document.getElementById('manage-section-content');
+            const icon = document.getElementById('manage-toggle-icon');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
 
-function updateQty(n,q){ s[n].q = parseInt(q) || 1; renderSelectedItems(); }
+        function retrieveInvoice(id = null) {
+            try {
+                const retrieveId = id || document.getElementById('retrieve-id')?.value.trim();
+                if (!retrieveId) { 
+                    alert("Please enter an invoice ID"); 
+                    return; 
+                }
+                
+                const savedData = localStorage.getItem(retrieveId);
+                if (!savedData) { 
+                    alert("Invoice not found!"); 
+                    return; 
+                }
+                
+                let data;
+                try {
+                    data = JSON.parse(savedData);
+                } catch (parseError) {
+                    alert("Corrupted invoice data. Please delete and recreate.");
+                    console.error('Invoice parse error:', parseError);
+                    return;
+                }
+                
+                if (!data || !data.client) {
+                    alert("Invalid invoice data structure");
+                    return;
+                }
 
-function removeItem(n){ delete s[n]; renderMenuItems(document.getElementById('search-input').value || ''); renderSelectedItems(); }
+                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+                if (Date.now() - (data.timestamp || 0) > THIRTY_DAYS_MS) {
+                    alert("This invoice has expired (older than 30 days). Creating new invoice from data.");
+                }
 
-// --- NEW FUNCTION: Toggle Manage Section ---
-function toggleManageSection() {
-    const section = document.getElementById('manage-section-content');
-    const icon = document.getElementById('manage-toggle-icon');
-    if (section.style.display === 'none') {
-        section.style.display = 'block';
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-up');
-    } else {
-        section.style.display = 'none';
-        icon.classList.remove('fa-chevron-up');
-        icon.classList.add('fa-chevron-down');
-    }
-}
+                // Safely set all form fields with fallbacks
+                const clientNameEl = document.getElementById('client-name');
+                const clientEmailEl = document.getElementById('client-email');
+                const eventDateEl = document.getElementById('event-date');
+                const locationTypeEl = document.getElementById('location-type');
+                const locationEl = document.getElementById('location');
+                const addressEl = document.getElementById('address');
+                const transportEl = document.getElementById('transport-fee');
+                const discountEl = document.getElementById('discount');
+                const invoiceIdEl = document.getElementById('current-invoice-id');
+                const amountPaidEl = document.getElementById('current-amount-paid');
+                const searchInput = document.getElementById('search-input');
+                
+                if (clientNameEl) clientNameEl.value = data.client || '';
+                if (clientEmailEl) clientEmailEl.value = data.email || '';
+                if (eventDateEl) eventDateEl.value = data.date || '';
+                if (locationTypeEl) locationTypeEl.value = data.locType || '';
+                if (locationEl) locationEl.value = data.locArea || '';
+                if (addressEl) addressEl.value = data.addr || '';
+                if (transportEl) transportEl.value = Math.max(0, data.transport || 0);
+                if (discountEl) discountEl.value = Math.max(0, data.discount || 0);
+                if (invoiceIdEl) invoiceIdEl.value = data.id || '';
+                if (amountPaidEl) amountPaidEl.value = Math.max(0, data.paid || 0);
+                
+                updateServiceChargeRate();
+                
+                // Restore items with validation
+                s = {};
+                const items = data.items || {};
+                Object.entries(items).forEach(([name, itemData]) => {
+                    if (name && itemData && typeof itemData.p === 'number' && typeof itemData.q === 'number') {
+                        s[name] = { p: Math.max(0, itemData.p), q: Math.max(1, itemData.q) };
+                    }
+                });
+                
+                renderSelectedItems();
+                renderMenuItems(searchInput ? (searchInput.value || '') : '');
+                renderEditItems();
+                alert(`Invoice ${data.id} loaded successfully.`);
+                goToStep(1);
+            } catch (e) {
+                console.error('Retrieve invoice error:', e);
+                alert('Error loading invoice');
+            }
+        }
 
-// --- NEW FEATURE: Retrieve Existing Invoice ---
-function retrieveInvoice() {
-    const id = document.getElementById('retrieve-id').value.trim();
-    if(!id) { alert("Please enter an invoice ID"); return; }
-    
-    const savedData = localStorage.getItem(id);
-    if(!savedData) { alert("Invoice not found! Please check the code."); return; }
-    
-    const data = JSON.parse(savedData);
+        function applyPayment() {
+            try {
+                const idEl = document.getElementById('payment-id');
+                const amountEl = document.getElementById('payment-amount');
+                
+                const id = idEl ? idEl.value.trim() : '';
+                const amount = amountEl ? parseFloat(amountEl.value) : 0;
+                
+                if (!id) { 
+                    alert("Please enter an invoice ID"); 
+                    return; 
+                }
+                if (isNaN(amount) || amount < 0 || amount > 999999999) { 
+                    alert("Please enter a valid amount (0-999,999,999)"); 
+                    return; 
+                }
+                
+                retrieveInvoice(id);
+                const amountPaidEl = document.getElementById('current-amount-paid');
+                if (amountPaidEl) {
+                    amountPaidEl.value = Math.max(0, parseFloat(amount.toFixed(2)));
+                }
+                generateInvoice();
+            } catch (e) {
+                console.error('Apply payment error:', e);
+                alert('Error applying payment');
+            }
+        }
 
-    // 30 DAY EXPIRY CHECK
-    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    if (now - (data.timestamp || 0) > THIRTY_DAYS_MS) {
-        alert("This invoice has expired (it is older than 30 days) and can no longer be edited.");
-        return;
-    }
-    
-    // Populate Form
-    document.getElementById('client-name').value = data.client;
-    document.getElementById('event-date').value = data.date;
-    // Guests input removed
-    document.getElementById('location-type').value = data.locType || '';
-    updateServiceChargeRate(); // ensure rate is set correctly
-    document.getElementById('location').value = data.locArea;
-    document.getElementById('address').value = data.addr;
-    document.getElementById('transport-fee').value = data.transport;
-    document.getElementById('discount').value = data.discount || 0; // Populate discount
-    
-    // Set IDs
-    document.getElementById('current-invoice-id').value = data.id;
-    document.getElementById('current-amount-paid').value = data.paid || 0;
-    
-    // Populate Items
-    s = data.items || {};
-    
-    renderSelectedItems();
-    renderMenuItems(document.getElementById('search-input').value || '');
-    
-    alert(`Invoice ${data.id} loaded successfully. You can now edit it.`);
-    document.getElementById('selected-items-container').scrollIntoView({behavior:'smooth'});
-}
+        function copyInvoiceId() {
+            try {
+                const code = document.getElementById('generated-id-code')?.textContent;
+                if (!code) {
+                    alert("No invoice ID to copy");
+                    return;
+                }
+                navigator.clipboard.writeText(code).then(() => {
+                    alert("Invoice Code copied!");
+                }).catch(err => {
+                    console.error('Copy error:', err);
+                    alert('Failed to copy');
+                });
+            } catch (e) {
+                console.error('Copy invoice ID error:', e);
+            }
+        }
 
-// --- NEW FEATURE: Apply Payment ---
-function applyPayment() {
-    const id = document.getElementById('payment-id').value.trim();
-    const amount = parseFloat(document.getElementById('payment-amount').value);
-    
-    if(!id) { alert("Please enter an invoice ID"); return; }
-    if(isNaN(amount)) { alert("Please enter a valid amount"); return; }
-    
-    const savedData = localStorage.getItem(id);
-    if(!savedData) { alert("Invoice not found!"); return; }
-    
-    const data = JSON.parse(savedData);
+        function generateInvoice() {
+            try {
+                const clientName = document.getElementById('client-name').value.trim();
+                const clientEmail = document.getElementById('client-email').value.trim();
+                const d = document.getElementById('event-date').value;
+                const l = document.getElementById('location').value;
+                const a = document.getElementById('address').value;
+                
+                // Validate required fields
+                if (!clientName || !d || !a) {
+                    alert('Please fill all required fields (Client Name, Event Date, Address)!');
+                    return;
+                }
+                
+                const items = Object.keys(s);
+                if (items.length === 0) {
+                    alert('Please select at least one menu item!');
+                    return;
+                }
 
-    // 30 DAY EXPIRY CHECK
-    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    if (now - (data.timestamp || 0) > THIRTY_DAYS_MS) {
-        alert("This invoice has expired (it is older than 30 days).");
-        return;
-    }
-    
-    // Load the data into the system first
-    document.getElementById('retrieve-id').value = id;
-    retrieveInvoice(); // Re-use retrieve logic to fill form
-    
-    // Now update payment
-    document.getElementById('current-amount-paid').value = amount;
-    
-    // Automatically generate invoice to show update
-    generateInvoice();
-}
+                let invId = document.getElementById('current-invoice-id').value;
+                if (!invId) {
+                    invId = 'INV-' + Date.now().toString().slice(-9);
+                    document.getElementById('current-invoice-id').value = invId;
+                }
 
-// Helper to copy ID
-function copyInvoiceId() {
-    const code = document.getElementById('generated-id-code').textContent;
-    if(code) {
-        navigator.clipboard.writeText(code).then(() => {
-            alert("Invoice Code copied to clipboard!");
-        });
-    }
-}
+                const dt = new Date().toLocaleDateString();
+                const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString();
+                let sub = 0;
+                
+                // Generate table rows with proper escaping
+                const rows = items.map(n => {
+                    try {
+                        const i = s[n];
+                        if (!i || typeof i.p !== 'number' || typeof i.q !== 'number') {
+                            console.warn(`Invalid item data: ${n}`, i);
+                            return '';
+                        }
+                        const tot = i.p * i.q;
+                        sub += tot;
+                        // Escape HTML in item name
+                        const escapedName = n.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                        return `<tr class="no-break"><td style="font-weight:800;">${escapedName}</td><td style="text-align:right;font-weight:800;">₦${i.p.toLocaleString()}</td><td style="text-align:center;font-weight:800;">${i.q}</td><td style="text-align:right;font-weight:800;">₦${tot.toLocaleString()}</td></tr>`;
+                    } catch (itemError) {
+                        console.error(`Error processing item ${n}:`, itemError);
+                        return '';
+                    }
+                }).join('');
 
-function generateInvoice(){
-    const clientName = document.getElementById('client-name').value.trim();
-    const d=document.getElementById('event-date').value,l=document.getElementById('location').value,a=document.getElementById('address').value;
-    
-    // Validate inputs (Removed Guests and Optional Location check)
-    if(!clientName){ alert('Please enter client name!'); return; }
-    if(!d||!a){ alert('Please fill in required event details (Date, Address)!'); return; }
-    
-    const items = Object.keys(s);
-    if(items.length===0){ alert('Please select at least one menu item!'); return; }
-    
-    // Determine Invoice ID (Keep existing if editing, else generate new)
-    let invId = document.getElementById('current-invoice-id').value;
-    if(!invId) {
-        invId = 'INV-' + Date.now();
-        document.getElementById('current-invoice-id').value = invId; // Set it for future saves
-    }
-    
-    const dt=new Date().toLocaleDateString(), dueDate=new Date(Date.now()+30*24*60*60*1000).toLocaleDateString();
-    
-    // Calculate Totals
-    let sub=0;
-    const rows = items.map(n=>{ const i=s[n], tot=i.p*i.q; sub+=tot; return `<tr class="invoice-item"><td>${n}</td><td style="text-align:right">₦${i.p.toLocaleString()}</td><td style="text-align:center">${i.q}</td><td style="text-align:right">₦${tot.toLocaleString()}</td></tr>` }).join('');
-    
-    const t=parseFloat(document.getElementById('transport-fee').value)||0;
-    const discount = parseFloat(document.getElementById('discount').value)||0; // Get discount
-    
-    // --- UPDATED SERVICE CHARGE LOGIC ---
-    let sc = 0;
-    let scLabel = '';
-    
-    if(sub < 300000) {
-        sc = 50000;
-        scLabel = 'Service Charge (Flat Rate):';
-    } else {
-        sc = sub * (serviceChargeRate / 100);
-        scLabel = `Service Charge (${serviceChargeRate}%):`;
-    }
-    // -------------------------------------
+                const t = Math.max(0, parseFloat(document.getElementById('transport-fee').value) || 0);
+                const discount = Math.max(0, parseFloat(document.getElementById('discount').value) || 0);
+            let sc = sub < 300000 ? 50000 : sub * (serviceChargeRate / 100);
+            const scLabel = sub < 300000 ? 'Service Charge (Flat):' : `Service Charge (${serviceChargeRate}%):`;
+            const vat = sc * 0.075;
+            const gt = (sub + sc + vat + t) - discount;
+            const amountPaid = parseFloat(document.getElementById('current-amount-paid').value) || 0;
+            const balanceDue = gt - amountPaid;
 
-    const vat = sc * 0.075;
-    // Calculate Grand Total with Discount
-    const gt = (sub + sc + vat + t) - discount;
-    
-    // Payment Calculations
-    const amountPaid = parseFloat(document.getElementById('current-amount-paid').value) || 0;
-    const balanceDue = gt - amountPaid;
-    
-    // --- SAVE TO STORAGE ---
-    const invoiceData = {
-        id: invId,
-        client: clientName,
-        date: d,
-        // guests removed from data
-        locType: document.getElementById('location-type').value,
-        locArea: l,
-        addr: a,
-        transport: t,
-        discount: discount, // Save discount
-        items: s,
-        paid: amountPaid,
-        timestamp: Date.now()
-    };
-    localStorage.setItem(invId, JSON.stringify(invoiceData));
-    // -----------------------
-    
-    // Display Logic
-    const paidRow = amountPaid > 0 ? 
-        `<div class="summary-row" style="color: green; font-weight: bold;">
-            <span class="summary-label">Amount Paid:</span>
-            <span class="summary-value">₦${amountPaid.toLocaleString()}</span>
-        </div>` : '';
-    
-    // Discount Row
-    const discountRow = discount > 0 ? 
-        `<div class="summary-row" style="color: #dc2626;">
-            <span class="summary-label">✨ Special Discount:</span>
-            <span class="summary-value">-₦${discount.toLocaleString()}</span>
-        </div>` : '';
-        
-    const balanceLabel = amountPaid > 0 ? "BALANCE DUE:" : "GRAND TOTAL:";
-    const balanceColor = amountPaid > 0 && balanceDue > 0 ? "#dc2626" : (balanceDue <= 0 ? "green" : "#fff");
-    
-    document.getElementById('invoice-to-print').innerHTML =
-    `<div class="invoice-header">
-        <div class="invoice-left">
-            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px">
-                <img src="cuisine-logo.jpg" alt="Cuisine Fantastique" class="invoice-logo">
-                <div class="invoice-header-details">
-                    <strong>Cuisine Fantastique</strong><br>
-                    Lekki Peninsula Scheme 2<br>
-                    Road 10b, Femi Olugbile street, Lagos<br>
-                    <strong>Phone:</strong> 08158894642<br>
-                    <strong>Email:</strong> cuisinefantastique1@gmail.com
+            if (balanceDue < 0) { alert('Balance cannot be negative.'); return; }
+
+            const invoiceData = {
+                id: invId,
+                client: clientName,
+                email: clientEmail,
+                date: d,
+                locType: document.getElementById('location-type').value,
+                locArea: l,
+                addr: a,
+                transport: t,
+                discount: discount,
+                items: s,
+                paid: amountPaid,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(invId, JSON.stringify(invoiceData));
+
+            const paidRow = amountPaid > 0 ? `<div class="summary-row no-break" style="color:green;font-weight:800;"><span>Amount Paid:</span><span>₦${amountPaid.toLocaleString()}</span></div>` : '';
+            const discountRow = discount > 0 ? `<div class="summary-row no-break" style="color:#dc2626;font-weight:800;"><span>✨ Discount:</span><span>-₦${discount.toLocaleString()}</span></div>` : '';
+            const balanceLabel = amountPaid > 0 ? "BALANCE DUE:" : "GRAND TOTAL:";
+
+            document.getElementById('invoice-to-print').innerHTML = `
+                <div style="display:flex;justify-content:space-between;border-bottom:3px solid #dc2626;padding-bottom:16px;margin-bottom:18px;">
+                    <div>
+                        <img src="cuisine-logo.jpg" alt="Logo" style="width:140px;margin-bottom:12px;">
+                        <div style="font-size:14px;color:#333;font-weight:800;line-height:1.8;">
+                            <strong style="font-size:15px;">Cuisine Fantastique</strong><br>
+                            Lekki Peninsula Scheme 2<br>
+                            Road 10b, Femi Olugbile street, Lagos<br>
+                            <strong>Phone:</strong> 08158894642<br>
+                            <strong>Email:</strong> cuisinefantastique1@gmail.com
+                        </div>
+                    </div>
+                    <div class="invoice-title" style="font-size:18px;">${new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
                 </div>
-            </div>
-        </div>
-        <div class="invoice-title">${new Date(d).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-    </div>
-    
-    <div class="invoice-details">
-        <div class="detail-box">
-            <h3>Bill To</h3>
-            <p><strong>${clientName}</strong></p>
-            <p style="margin-top:4px;"><strong>Event Venue:</strong> ${a}</p>
-        </div>
-        <div class="detail-box">
-            <h3>Invoice Details</h3>
-            <p><strong>Invoice #:</strong> ${invId}</p>
-            <p><strong>Invoice Date:</strong> ${dt}</p>
-            <p><strong>Due Date:</strong> ${dueDate}</p>
-            <p><strong>Balance Due:</strong> ₦${balanceDue.toLocaleString()}</p>
-        </div>
-    </div>
-    
-    <table class="items-table">
-        <thead>
-            <tr><th>Description</th><th style="text-align:right">Rate</th><th style="text-align:center">Qty</th><th style="text-align:right">Total</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-    </table>
-    
-    <div class="invoice-summary-block">
-        <div class="summary-row">
-            <span class="summary-label">Subtotal:</span>
-            <span class="summary-value" id="subtotal">₦${sub.toLocaleString()}</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">${scLabel}</span>
-            <span class="summary-value" id="service-charge">₦${sc.toLocaleString()}</span>
-        </div>
-        <div class="summary-row">
-            <span class="summary-label">Transportation Fee:</span>
-            <span class="summary-value" id="transport-amount">₦${t.toLocaleString()}</span>
-        </div>
-        <div class="summary-row" style="font-size:9px;color:#666;border-bottom:none;padding:4px 0">
-            <span class="summary-label" style="color:#666"><em>VAT (7.5% on Service Charge):</em></span>
-            <span class="summary-value" id="vat-amount" style="color:#666">₦${vat.toLocaleString()}</span>
-        </div>
-        ${discountRow}
-        ${amountPaid > 0 ? 
-        `<div class="summary-row grand-total" style="background:#666; font-size:11px;">
-            <span class="summary-label">Total Amount:</span>
-            <span class="summary-value">₦${gt.toLocaleString()}</span>
-        </div>` : ''}
-        ${paidRow}
-        <div class="summary-row grand-total">
-            <span class="summary-label">${balanceLabel}</span>
-            <span class="summary-value" id="grand-total">₦${balanceDue.toLocaleString()}</span>
-        </div>
-    </div>
-    
-    <div class="payment-block">
-        <h3>Payment Instructions</h3>
-        <div class="bank-details">
-            <strong>Bank Transfer:</strong><br>
-            Account Number: 2094187584<br>
-            Account Name: Cuisine Fantastique<br>
-            Bank Name: UBA
-        </div>
-        <h3 style="margin-top:10px">Important Terms & Conditions</h3>
-        <ul>
-            <li>A 100% non-refundable payment is required as commitment/booking fee</li>
-            <li>All payments are non-refundable</li>
-            <li>Kindly check if we are still available on your chosen date before paying a deposit</li>
-            <li>In the case of a cancellation, all payments made are only transferable and cannot be refunded</li>
-            <li>Please NOTE that the invoice is only valid for one month and prices can change based on market price</li>
-        </ul>
-    </div>`;
-    
-    window.lastInvoiceId = invId.replace(/\s+/g,'');
-    
-    // Show ID Copy Box
-    document.getElementById('generated-id-code').textContent = invId;
-    document.getElementById('id-display-box').style.display = 'flex';
-    
-    document.getElementById('invoice-preview').classList.add('active');
-    document.getElementById('invoice-preview').scrollIntoView({behavior:'smooth'});
-}
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;font-size:13px;">
+                    <div style="background:#f9f9f9;padding:12px;border-radius:5px;border-left:5px solid #dc2626;">
+                        <h3 style="color:#dc2626;margin-bottom:8px;font-size:14px;font-weight:800;">Bill To</h3>
+                        <p style="font-weight:800;font-size:14px;"><strong>${clientName}</strong></p>
+                        <p style="margin-top:6px;font-weight:800;font-size:13px;"><strong>Venue:</strong> ${a}</p>
+                    </div>
+                    <div style="background:#f9f9f9;padding:12px;border-radius:5px;border-left:5px solid #dc2626;">
+                        <h3 style="color:#dc2626;margin-bottom:8px;font-size:14px;font-weight:800;">Invoice Details</h3>
+                        <p style="font-weight:800;font-size:13px;"><strong>Invoice #:</strong> ${invId}</p>
+                        <p style="font-weight:800;font-size:13px;"><strong>Date:</strong> ${dt}</p>
+                        <p style="font-weight:800;font-size:13px;"><strong>Due:</strong> ${dueDate}</p>
+                        <p style="font-weight:800;font-size:13px;"><strong>Balance:</strong> ₦${balanceDue.toLocaleString()}</p>
+                    </div>
+                </div>
+                <table class="items-table" style="font-size:13px;">
+                    <thead><tr style="font-size:14px;"><th>Description</th><th style="text-align:right;">Rate</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Total</th></tr></thead>
+                    <tbody style="font-size:13px;">${rows}</tbody>
+                </table>
+                <div style="margin-top:16px;padding:14px;background:#f9f9f9;border-radius:5px;border-left:5px solid #dc2626;">
+                    <div class="summary-row" style="font-size:13px;padding:8px 0;"><span class="summary-label" style="font-size:13px;">Subtotal:</span><span class="summary-value" style="font-size:13px;">₦${sub.toLocaleString()}</span></div>
+                    <div class="summary-row" style="font-size:13px;padding:8px 0;"><span class="summary-label" style="font-size:13px;">${scLabel}</span><span class="summary-value" style="font-size:13px;">₦${sc.toLocaleString()}</span></div>
+                    <div class="summary-row" style="font-size:13px;padding:8px 0;"><span class="summary-label" style="font-size:13px;">Transport:</span><span class="summary-value" style="font-size:13px;">₦${t.toLocaleString()}</span></div>
+                    <div class="summary-row" style="font-size:12px;color:#666;border-bottom:none;padding:6px 0;font-weight:800;"><span><em>VAT (7.5%):</em></span><span>₦${vat.toLocaleString()}</span></div>
+                    ${discountRow}
+                    ${amountPaid > 0 ? `<div class="summary-row grand-total no-break" style="background:#666;font-size:14px;"><span>Total:</span><span>₦${gt.toLocaleString()}</span></div>` : ''}
+                    ${paidRow}
+                    <div class="summary-row grand-total no-break" style="font-size:15px;padding:12px;"><span>${balanceLabel}</span><span>₦${balanceDue.toLocaleString()}</span></div>
+                </div>
+                <div style="margin-top:20px;padding:14px;background:#fff5f5;border-radius:5px;border-left:5px solid #dc2626;font-size:12px;line-height:1.8;">
+                    <h3 style="color:#dc2626;margin-bottom:10px;font-size:14px;font-weight:800;">Payment Instructions</h3>
+                    <div style="background:#fff;padding:10px;border-radius:4px;margin:8px 0;font-weight:800;border:2px dashed #dc2626;font-size:13px;">
+                        <strong>Bank Transfer:</strong><br>
+                        Account: 2094187584<br>
+                        Name: Cuisine Fantastique<br>
+                        Bank: UBA
+                    </div>
+                    <h3 style="margin-top:14px;color:#dc2626;font-weight:800;font-size:14px;">Terms & Conditions</h3>
+                    <ul style="margin-left:20px;margin-top:8px;font-size:12px;line-height:1.8;">
+                        <li style="font-weight:800;margin-bottom:6px;">100% non-refundable payment required as booking fee</li>
+                        <li style="font-weight:800;margin-bottom:6px;">All payments are non-refundable</li>
+                        <li style="font-weight:800;margin-bottom:6px;">Check availability before deposit</li>
+                        <li style="font-weight:800;margin-bottom:6px;">Payments are transferable only, not refundable</li>
+                        <li style="font-weight:800;">Invoice valid for one month</li>
+                    </ul>
+                </div>
+                <div style="text-align:center;font-size:11pt;color:#333;margin-top:20mm;font-weight:800;">Thank you for choosing Cuisine Fantastique! | Generated on ${dt}</div>
+            `;
 
-function updateCalculations(){
-    // Basic calculation for PDF only, though PDF generation calls generateInvoice mostly. 
-    // This is kept for safety if someone manually edits DOM before print.
-    let subtotalAmount = 0;
-    document.querySelectorAll('.invoice-item').forEach(row => {
-        const rate = parseFloat(row.cells[1].textContent.replace('₦','').replace(/,/g,'')) || 0;
-        const qty = parseInt(row.cells[2].textContent) || 0;
-        subtotalAmount += rate * qty;
-    });
-    
-    // --- UPDATED LOGIC HERE TOO ---
-    let serviceCharge = 0;
-    if (subtotalAmount < 300000) {
-        serviceCharge = 50000;
-    } else {
-        serviceCharge = subtotalAmount * (serviceChargeRate / 100);
-    }
-    // ------------------------------
+            document.getElementById('generated-id-code').textContent = invId;
+            document.getElementById('id-display-box').style.display = 'flex';
+            document.getElementById('invoice-preview').style.display = 'block';
+            
+            if (clientEmail) {
+                document.getElementById('invoice-email').value = clientEmail;
+            }
+            
+            document.getElementById('invoice-preview').scrollIntoView({ behavior: 'smooth' });
+            } catch (e) {
+                console.error('Generate invoice error:', e);
+                alert('Error generating invoice');
+            }
+        }
 
-    const transportationFee = parseFloat(document.getElementById('transport-fee').value) || 0;
-    const discount = parseFloat(document.getElementById('discount').value) || 0; // Discount calc
-    
-    const vat = serviceCharge * 0.075;
-    const grandTotal = (subtotalAmount + serviceCharge + vat + transportationFee) - discount;
-    
-    document.getElementById('subtotal').textContent = '₦' + subtotalAmount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('service-charge').textContent = '₦' + serviceCharge.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('vat-amount').textContent = '₦' + vat.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('transport-amount').textContent = '₦' + transportationFee.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('grand-total').textContent = '₦' + grandTotal.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+        function updateFloatingButton() {
+            try {
+                const btn = document.getElementById('float-next-btn');
+                if (!btn) return;
+                
+                if (typeof currentStep !== 'number' || !s) return;
+                
+                if (currentStep === 2 && Object.keys(s).length > 0) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            } catch (e) {
+                console.error('Update floating button error:', e);
+            }
+        }
 
-function generatePDF(){
-    const el = document.getElementById('invoice-to-print');
-    if(!el || el.innerHTML.trim()===''){
-        alert('No invoice to export. Please generate the invoice first.');
-        return;
-    }
+        function scrollToNextButton() {
+            try {
+                const nextBtn = document.querySelector('#step2-section .next-btn');
+                if (nextBtn) {
+                    nextBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    nextBtn.style.animation = 'pulse 0.5s';
+                    setTimeout(() => nextBtn.style.animation = '', 500);
+                }
+            } catch (e) {
+                console.error('Scroll error:', e);
+            }
+        }
 
-    // Ensure calculations are fresh
-    // updateCalculations(); // Commented out to prevent overwriting complex payment layout
+        function sendInvoiceEmail() {
+            try {
+                const emailEl = document.getElementById('invoice-email');
+                const messageEl = document.getElementById('invoice-message');
+                const invoiceIdEl = document.getElementById('current-invoice-id');
+                const clientNameEl = document.getElementById('client-name');
+                
+                const email = emailEl ? emailEl.value.trim() : '';
+                const message = messageEl ? messageEl.value.trim() : '';
+                const invoiceId = invoiceIdEl ? invoiceIdEl.value : '';
+                const clientName = clientNameEl ? clientNameEl.value : '';
+                
+                if (!email) {
+                    alert('Please enter an email address');
+                    return;
+                }
+                
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+                
+                if (!invoiceId) {
+                    alert('No invoice ID found');
+                    return;
+                }
+                
+                alert(`✅ Invoice sent to ${email}!\n\n(In production, this will send real emails)`);
+                console.log('Email data:', { 
+                    to: email, 
+                    subject: `Invoice ${invoiceId}`, 
+                    body: message, 
+                    client: clientName 
+                });
+            } catch (e) {
+                console.error('Send email error:', e);
+                alert('Error sending email');
+            }
+        }
 
-    const filename = 'Invoice-' + (window.lastInvoiceId || Date.now()) + '.pdf';
-    const opt = {
-        margin:       5,
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 4, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-    };
+        function showAnalytics() {
+            try {
+                calculateAnalytics();
+                const modal = document.getElementById('analytics-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                } else {
+                    alert('Analytics modal not found');
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
 
-    html2pdf().set(opt).from(el).save()
-        .then(() => { /* success */ })
-        .catch(err => { console.error(err); alert('PDF generation failed. Please try again.'); });
-}
+        function calculateAnalytics() {
+            try {
+                const invoices = Object.keys(localStorage)
+                    .filter(key => key.startsWith('INV-'))
+                    .map(key => {
+                        try {
+                            return JSON.parse(localStorage.getItem(key));
+                        } catch (e) {
+                            return null;
+                        }
+                    })
+                    .filter(inv => inv !== null);
+                
+                if (invoices.length === 0) {
+                    document.getElementById('stat-total-invoices').textContent = '0';
+                    document.getElementById('stat-total-revenue').textContent = '₦0';
+                    document.getElementById('stat-total-paid').textContent = '₦0';
+                    document.getElementById('stat-pending').textContent = '₦0';
+                    document.getElementById('stat-avg-value').textContent = '₦0';
+                    document.getElementById('stat-payment-rate').textContent = '0%';
+                    document.getElementById('most-category').textContent = 'No data yet';
+                    document.getElementById('top-month').textContent = 'No data yet';
+                    document.getElementById('items-sold').textContent = '0';
+                    document.getElementById('avg-items').textContent = '0';
+                    return;
+                }
+                
+                // Calculate revenue metrics
+                let totalRevenue = 0;
+                invoices.forEach(inv => {
+                    if (!inv) return;
+                    const items = inv.items || {};
+                    const subtotal = Object.values(items).reduce((s, i) => s + (i.p * i.q), 0);
+                    const transport = inv.transport || 0;
+                    const discount = inv.discount || 0;
+                    let sc = subtotal < 300000 ? 50000 : subtotal * 0.15;
+                    const vat = sc * 0.075;
+                    totalRevenue += (subtotal + sc + vat + transport - discount);
+                });
+                
+                const totalInvoices = invoices.length;
+                const avgInvoiceValue = totalInvoices > 0 ? totalRevenue / totalInvoices : 0;
+                const totalPaid = invoices.reduce((sum, inv) => sum + (inv.paid || 0), 0);
+                const pendingPayments = totalRevenue - totalPaid;
+                const paymentRate = totalRevenue > 0 ? Math.round((totalPaid / totalRevenue) * 100) : 0;
+                
+                // Calculate items metrics
+                let totalItems = 0;
+                const categoryCount = {};
+                invoices.forEach(inv => {
+                    if (!inv) return;
+                    const items = inv.items || {};
+                    Object.entries(items).forEach(([itemName, itemData]) => {
+                        if (itemData && itemData.q) {
+                            totalItems += itemData.q;
+                            categoryCount[itemName] = (categoryCount[itemName] || 0) + itemData.q;
+                        }
+                    });
+                });
+                
+                const avgItemsPerInvoice = totalInvoices > 0 ? (totalItems / totalInvoices).toFixed(1) : 0;
+                const mostCategory = Object.keys(categoryCount).length > 0 
+                    ? Object.keys(categoryCount).reduce((a, b) => categoryCount[a] > categoryCount[b] ? a : b)
+                    : 'No data';
+                const displayMostCategory = mostCategory && mostCategory !== 'No data' ? mostCategory.substring(0, 30) + (mostCategory.length > 30 ? '...' : '') : 'No data';
+                
+                // Monthly data for chart
+                const monthlyData = {};
+                invoices.forEach(inv => {
+                    if (!inv || !inv.timestamp) return;
+                    const month = new Date(inv.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                    const items = inv.items || {};
+                    const subtotal = Object.values(items).reduce((s, i) => s + (i.p * i.q), 0);
+                    const transport = inv.transport || 0;
+                    const discount = inv.discount || 0;
+                    let sc = subtotal < 300000 ? 50000 : subtotal * 0.15;
+                    const vat = sc * 0.075;
+                    const monthlyTotal = subtotal + sc + vat + transport - discount;
+                    monthlyData[month] = (monthlyData[month] || 0) + monthlyTotal;
+                });
+                
+                const topMonth = Object.keys(monthlyData).length > 0
+                    ? Object.keys(monthlyData).reduce((a, b) => monthlyData[a] > monthlyData[b] ? a : b)
+                    : 'No data';
+                
+                // Update all stat cards
+                document.getElementById('stat-total-invoices').textContent = totalInvoices;
+                document.getElementById('stat-total-revenue').textContent = '₦' + Math.round(totalRevenue).toLocaleString();
+                document.getElementById('stat-total-paid').textContent = '₦' + Math.round(totalPaid).toLocaleString();
+                document.getElementById('stat-pending').textContent = '₦' + Math.round(pendingPayments).toLocaleString();
+                document.getElementById('stat-avg-value').textContent = '₦' + Math.round(avgInvoiceValue).toLocaleString();
+                document.getElementById('stat-payment-rate').textContent = paymentRate + '%';
+                document.getElementById('most-category').textContent = displayMostCategory;
+                document.getElementById('top-month').textContent = topMonth;
+                document.getElementById('items-sold').textContent = totalItems;
+                document.getElementById('avg-items').textContent = avgItemsPerInvoice;
+                
+                // Create revenue chart with delay
+                setTimeout(() => {
+                    try {
+                        const canvas = document.getElementById('revenueChart');
+                        if (!canvas) return;
+                        
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) return;
+                        
+                        if (window.revenueChart) {
+                            window.revenueChart.destroy();
+                        }
+                        
+                        window.revenueChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: Object.keys(monthlyData),
+                                datasets: [{
+                                    label: 'Revenue (₦)',
+                                    data: Object.values(monthlyData),
+                                    backgroundColor: 'rgba(220, 38, 38, 0.8)',
+                                    borderColor: 'rgba(220, 38, 38, 1)',
+                                    borderWidth: 2,
+                                    borderRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: true, position: 'top' } },
+                                scales: { 
+                                    y: { 
+                                        beginAtZero: true,
+                                        ticks: { callback: function(value) { return '₦' + value.toLocaleString(); } }
+                                    } 
+                                }
+                            }
+                        });
+                    } catch (chartError) {
+                        console.error('Chart error:', chartError);
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Analytics error:', error);
+                alert('Error loading analytics: ' + error.message);
+            }
+        }
 
-init();
-    
+        function showPasswordModal(action) {
+            passwordAction = action;
+            document.getElementById('password-modal').style.display = 'flex';
+            document.getElementById('password-input').value = '';
+            document.getElementById('password-input').focus();
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password-input').value;
+            if (password === '654321') {
+                document.getElementById('password-modal').style.display = 'none';
+                if (passwordAction === 'pdf') {
+                    generatePDF();
+                } else if (passwordAction === 'print') {
+                    printInvoice();
+                }
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        function generatePDF() {
+            try {
+                const el = document.getElementById('invoice-to-print');
+                if (!el) {
+                    alert('Invoice element not found');
+                    return;
+                }
+                
+                if (!el.innerHTML || !el.innerHTML.trim()) { 
+                    alert('No invoice to export'); 
+                    return; 
+                }
+                
+                const idEl = document.getElementById('current-invoice-id');
+                const invoiceId = idEl ? idEl.value : 'Invoice';
+                
+                if (!invoiceId || typeof invoiceId !== 'string') {
+                    alert('Invalid invoice ID');
+                    return;
+                }
+                
+                if (typeof html2pdf === 'undefined') {
+                    alert('PDF library not loaded. Please refresh the page.');
+                    return;
+                }
+                
+                const filename = 'Invoice-' + invoiceId + '.pdf';
+                const opt = {
+                    margin: 5,
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 4, useCORS: true, logging: false, allowTaint: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                };
+                
+                html2pdf().set(opt).from(el).save().catch(err => {
+                    console.error('PDF generation error:', err);
+                    alert('PDF generation failed: ' + (err.message || 'Unknown error'));
+                });
+            } catch (e) {
+                console.error('Generate PDF error:', e);
+                alert('Error generating PDF');
+            }
+        }
+
+        function printInvoice() {
+            try {
+                const printEl = document.getElementById('invoice-to-print');
+                if (!printEl) {
+                    alert('No invoice to print');
+                    return;
+                }
+                
+                const printContent = printEl.innerHTML;
+                if (!printContent || printContent.trim().length === 0) {
+                    alert('Invoice content is empty');
+                    return;
+                }
+                
+                const originalContent = document.body.innerHTML;
+                document.body.innerHTML = printContent;
+                window.print();
+                document.body.innerHTML = originalContent;
+                
+                // Reload without blocking user
+                setTimeout(() => location.reload(), 500);
+            } catch (e) {
+                console.error('Print invoice error:', e);
+                alert('Error printing invoice');
+                location.reload();
+            }
+        }
+
+        function showInvoicesList() {
+            try {
+                const list = document.getElementById('invoices-list');
+                if (!list) return;
+                
+                list.innerHTML = '';
+                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+                
+                const keys = Object.keys(localStorage)
+                    .filter(key => key && key.startsWith('INV-'))
+                    .sort((a, b) => {
+                        try {
+                            const dataA = JSON.parse(localStorage.getItem(a));
+                            const dataB = JSON.parse(localStorage.getItem(b));
+                            return (dataB?.timestamp || 0) - (dataA?.timestamp || 0);
+                        } catch (e) {
+                            return 0;
+                        }
+                    });
+                
+                keys.forEach(key => {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (!data || !data.client) return;
+                        
+                        // Check 30-day expiration
+                        if (Date.now() - (data.timestamp || 0) > THIRTY_DAYS_MS) {
+                            localStorage.removeItem(key); // Clean up expired invoices
+                            return;
+                        }
+                        
+                        // Calculate totals safely
+                        const items = data.items || {};
+                        let subtotal = 0;
+                        Object.values(items).forEach(i => {
+                            if (i && typeof i.p === 'number' && typeof i.q === 'number') {
+                                subtotal += (i.p * i.q);
+                            }
+                        });
+                        
+                        const transport = Math.max(0, data.transport || 0);
+                        const discount = Math.max(0, data.discount || 0);
+                        let sc = subtotal < 300000 ? 50000 : subtotal * 0.15;
+                        const vat = sc * 0.075;
+                        const total = subtotal + sc + vat + transport - discount;
+                        const paid = Math.max(0, data.paid || 0);
+                        const isPaid = paid >= total;
+                        const remaining = Math.max(0, total - paid);
+                        
+                        const card = document.createElement('div');
+                        card.className = 'invoice-card';
+                        const statusColor = isPaid ? '#059669' : '#f59e0b';
+                        const statusText = isPaid ? '✓ PAID' : `Pending: ₦${remaining.toLocaleString()}`;
+                        const escapedKey = key.replace(/'/g, "\\'");
+                        const safeClient = (data.client || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        const safeDate = (data.date || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        
+                        card.innerHTML = `
+                            <div style="flex:1;min-width:0;">
+                                <div class="meta">${key} — <span style="color:#666;font-weight:800;">${safeClient}</span></div>
+                                <div style="font-size:12px;color:#666;margin-top:4px;">Event: ${safeDate} • Created: ${new Date(data.timestamp).toLocaleDateString()}</div>
+                                <div style="font-size:12px;color:${statusColor};font-weight:800;margin-top:4px;">${statusText}</div>
+                            </div>
+                            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                                <button onclick="retrieveInvoice('${escapedKey}'); closeModal();" style="background:#059669;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:800;font-size:12px;">Load</button>
+                                <button onclick="markAsPaidModal('${escapedKey}', ${total});" style="background:#8b5cf6;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:800;font-size:12px;">Pay</button>
+                                <button onclick="deleteInvoice('${escapedKey}');" style="background:#dc2626;color:#fff;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:800;font-size:12px;">Delete</button>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    } catch (itemError) {
+                        console.error(`Error processing invoice ${key}:`, itemError);
+                    }
+                });
+                
+                const invoicesModal = document.getElementById('invoices-modal');
+                if (invoicesModal) {
+                    invoicesModal.style.display = 'flex';
+                }
+
+                const searchInput = document.getElementById('invoices-search');
+                if (searchInput) {
+                    // Remove previous listeners by cloning and replacing
+                    const newSearchInput = searchInput.cloneNode(true);
+                    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+                    
+                    newSearchInput.addEventListener('input', e => {
+                        const term = String(e.target.value || '').toLowerCase().trim();
+                        if (!list) return;
+                        Array.from(list.children).forEach(card => {
+                            const text = card.textContent.toLowerCase();
+                            card.style.display = text.includes(term) ? '' : 'none';
+                        });
+                    });
+                }
+            } catch (e) {
+                console.error('Show invoices list error:', e);
+                alert('Error loading invoices');
+            }
+        }
+
+        function closeModal() {
+            try {
+                const invoicesModal = document.getElementById('invoices-modal');
+                if (invoicesModal) {
+                    invoicesModal.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Close modal error:', e);
+            }
+        }
+
+        function markAsPaidModal(invoiceId, totalAmount) {
+            try {
+                const paidAmount = prompt(`Enter amount paid for ${invoiceId}:\n\nTotal Due: ₦${totalAmount.toLocaleString()}`, totalAmount.toString());
+                if (paidAmount === null) return;
+                
+                const amount = parseFloat(paidAmount);
+                if (isNaN(amount) || amount < 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+                
+                // Validate invoice exists
+                const invoiceData = localStorage.getItem(invoiceId);
+                if (!invoiceData) {
+                    alert('Invoice not found in database');
+                    return;
+                }
+                
+                // Update invoice with payment
+                const data = JSON.parse(invoiceData);
+                data.paid = amount;
+                localStorage.setItem(invoiceId, JSON.stringify(data));
+                
+                alert(`✓ Invoice ${invoiceId} updated!\nAmount Paid: ₦${amount.toLocaleString()}`);
+                showInvoicesList(); // Refresh the list
+            } catch (error) {
+                console.error('Payment update error:', error);
+                alert('Error updating payment: ' + error.message);
+            }
+        }
+
+        function deleteInvoice(id) {
+            try {
+                if (confirm(`Delete invoice ${id}?`)) {
+                    localStorage.removeItem(id);
+                    showInvoicesList();
+                    alert('Invoice deleted successfully');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Error deleting invoice: ' + error.message);
+            }
+        }
+
+        window.addEventListener('error', (e) => {
+            if (e.message && e.message.includes('QuotaExceededError')) {
+                alert('Storage limit reached. Please delete old invoices to free up space.');
+                console.warn('localStorage quota exceeded');
+            }
+        });
+        
+        // Prevent infinite loops and deadlocks
+        let isProcessing = false;
+        
+        // Debounce function for performance
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize app
+        try {
+            init();
+            checkStorageQuota(); // Check storage on load
+        } catch (e) {
+            console.error('App initialization error:', e);
+            alert('Error initializing application. Please refresh the page.');
+        }
     </script>
 </body>
 </html>
