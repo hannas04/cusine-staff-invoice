@@ -300,11 +300,7 @@
     </div>
 
     <script>
-        // Replace the existing `const m = [...]` menu array with the updated 2026 menu below.
-        // Items where the price was changed from the prior file are annotated with a comment above the entry.
-        // Each item now includes a `d` field (description). The UI will display `n` (title) and `d` (description),
-        // and the invoice PDF will use the description as the line item text.
-
+        // Replace the existing `const m = [...]` definition with the full menu (added missing categories/items).
         const m = [
           /* CANAPÉS - ₦2,000 per item */
           { n: "Veggies Roll", d: "Veggies Roll with Sweet Chilli Dip", p: 2000, c: "Canapés" },
@@ -364,50 +360,38 @@
           /* BREAKFAST MENUS (per guest) */
           { n: "Breakfast Menu 1", d: "Includes 2 Snacks (Mini Sandwiches, Mini Meat Pie, Mini Sausage Roll, or Scotch Egg), Includes 1 Protein, Includes Tea Station", p: 12000, c: "Breakfast" },
           { n: "Breakfast Menu 2", d: "Tea Station, Sliced Bread, Sausage, Baked Beans, Scrambled Eggs, Boiled Plantain, Boiled Yam, Fish Stew, Sauteed Potatoes, Nigerian Egg Sauce", p: 12000, c: "Breakfast" },
-          // PRICE CHANGED: was 6000 -> now 12000
           { n: "Breakfast Menu 3", d: "Executive Snacks (2 per person: Mini Croissant, Mini Pain Du Chocolate, Muffins, Mini Sliders, Waffles, Puff Pastry Meat Pie, Puff Pastry Sausage, or Sandwiches). Includes 1 Protein. Includes Juice Station", p: 12000, c: "Breakfast" },
-          { n: "Buffet Style Breakfast", d: "Wide spread including Teas, Coffee, Juice, Mini Snacks, Bread Rolls, Cupcakes, Sandwiches, Pancakes, Grilled Sausages, Spicy Chicken Wings, Fruit Platter, Tapioca, Boiled Yam, Plantain, Sweet Potatoes, Titus Sauce, Various Eggs, Macaroni, Ewa Agoyin, Baked Beans, Sliced Bread, Irish Potatoes", p: 15000, c: "Breakfast" },
+          { n: "Buffet Style Breakfast", d: "Wide spread including Teas (Green, Black, Flavored), Coffee, Juice, Mini Snacks (Meat Pie, Sausage Roll, Doughnut), Bread Rolls, Cupcakes, Sandwiches, Pancakes, Grilled Sausages, Spicy Chicken Wings, Fruit Platter, Tapioca, Boiled Yam, Plantain, Sweet Potatoes, Titus Sauce, Various Eggs, Macaroni, Ewa Agoyin, Baked Beans, Sliced Bread, Irish Potatoes", p: 15000, c: "Breakfast" },
 
           /* SMALL CHOPS (per guest) */
-          { n: "Small Chops Option 1", d: "1 Veg Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas", p: 2500, c: "Small Chops" },
-          { n: "Small Chops Option 2", d: "Includes Corndog", p: 2700, c: "Small Chops" },
-          { n: "Small Chops Option 3", d: "Includes Peppered Gizzard", p: 3000, c: "Small Chops" },
-          { n: "Small Chops Option 4", d: "Includes Fish in Batter", p: 3200, c: "Small Chops" },
-          { n: "Small Chops Option 5", d: "Includes Prawn in Batter", p: 3800, c: "Small Chops" },
-          { n: "Small Chops Option 6", d: "Includes Prawn Tempura", p: 4200, c: "Small Chops" },
-          { n: "Small Chops Option 7", d: "Includes Peppered Snail", p: 4200, c: "Small Chops" },
-          { n: "Small Chops Option 8", d: "Prawn Mayonnaise Springroll, Chicken Moneybag, BBQ Chicken/Wings, Puff Puff, Mosas, Corndog", p: 4200, c: "Small Chops" },
-          // PRICE CHANGED: was 4800 -> now 5200
+          { n: "Small Chops Option 1", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas", p: 2500, c: "Small Chops" },
+          { n: "Small Chops Option 2", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Corndog", p: 2700, c: "Small Chops" },
+          { n: "Small Chops Option 3", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Peppered Gizzard", p: 3000, c: "Small Chops" },
+          { n: "Small Chops Option 4", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 4 Puff Puff, 3 Mosas, 1 Fish in Batter", p: 3200, c: "Small Chops" },
+          { n: "Small Chops Option 5", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Prawn in Batter", p: 3800, c: "Small Chops" },
+          { n: "Small Chops Option 6", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Prawn Tempura", p: 4200, c: "Small Chops" },
+          { n: "Small Chops Option 7", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Snail", p: 4200, c: "Small Chops" },
+          { n: "Small Chops Option 8", d: "1 Prawn Mayonnaise Springroll, 1 Chicken Moneybag, 1 BBQ Chicken/Wings, 5 Puff Puff, 4 Mosas, 1 Corndog", p: 4200, c: "Small Chops" },
           { n: "Small Chops Option 9", d: "1 Veg Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 1 Fish in Batter, 1 Peppered Snail, 5 Puff Puff, 4 Mosas", p: 5200, c: "Small Chops" },
-          { n: "Small Chops Option 10", d: "Includes Corndog, Peppered Snail, Corn on Cob", p: 5600, c: "Small Chops" },
-          { n: "Small Chops Option 11", d: "Includes Fish in Batter, Peppered Gizzard, Pancake Hotdog", p: 5600, c: "Small Chops" },
-          { n: "Small Chops Option 12", d: "Includes Peppered Snail, Prawn Tempura", p: 6100, c: "Small Chops" },
-          { n: "Small Chops Option 13", d: "Includes Chicken Moneybag, Fantail Prawn, Corn on Cob", p: 7100, c: "Small Chops" },
-          { n: "Small Chops Option 14", d: "Large selection (meatball, snails, gizzard, fish, prawn)", p: 7800, c: "Small Chops" },
-          { n: "Small Chops Option 15", d: "Suya Springroll, Prawn Tempura, Chicken Lollipop, Fish Cake, Chicken Moneybag, Puff Puff & Skewers", p: 8100, c: "Small Chops" },
-          { n: "Small Chops Option 16", d: "Suya Springroll, Prawn Tempura, Chicken Lollipop, Fish Cake, Chicken Moneybag, Fish in Batter, Puff Puff & Skewers", p: 9000, c: "Small Chops" },
+          { n: "Small Chops Option 10", d: "1 Prawn Mayonnaise Springroll, 1 Chicken Moneybag, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Corndog, 1 Peppered Snail, 1 Corn on Cob", p: 5600, c: "Small Chops" },
+          { n: "Small Chops Option 11", d: "1 Prawn Mayonnaise Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Fish in Batter, 1 Peppered Gizzard, 1 Pancake Hotdog", p: 5600, c: "Small Chops" },
+          { n: "Small Chops Option 12", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Peppered Snail, 1 Prawn Tempura", p: 6100, c: "Small Chops" },
+          { n: "Small Chops Option 13", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 1 Chicken Moneybag, 1 Fantail Prawn, 5 Puff Puff, 4 Mosas, 1 Corn on Cob", p: 7100, c: "Small Chops" },
+          { n: "Small Chops Option 14", d: "1 Veggie Springroll, 1 Beefy Samosa, 1 BBQ Chicken, 5 Puff Puff, 4 Mosas, 1 Meatball, 1 Peppered Snail, 1 Peppered Gizzard, 1 Fish in Batter, 1 Prawn in Batter", p: 7800, c: "Small Chops" },
+          { n: "Small Chops Option 15", d: "1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, Puff Puff & Skewers", p: 8100, c: "Small Chops" },
+          { n: "Small Chops Option 16", d: "1 Suya Springroll, 1 Prawn Tempura, 1 Chicken Lollipop, 1 Fish Cake, 1 Chicken Moneybag, 1 Fish in Batter, Puff Puff & Skewers", p: 9000, c: "Small Chops" },
 
           /* GRILL HOUSE & GRILLS */
-          // PRICE CHANGED: was 9000 -> now 11000
           { n: "Grilled Whole Fish", d: "Grilled Whole Fish (with yam, plantain & potatoes)", p: 11000, c: "Grill House" },
-          // PRICE CHANGED: was 4500 -> now 5500
           { n: "Titus Fish & Bole", d: "Titus Fish & Bole", p: 5500, c: "Grill House" },
-          // PRICE CHANGED: was 4500 -> now 5500
           { n: "Mini Grilled Catfish or Croaker", d: "Mini Grilled Catfish or Croaker (with yam, plantain & potatoes)", p: 5500, c: "Grill House" },
-          // PRICE CHANGED: was 6000 -> now 6500
           { n: "Grilled Turkey Combo", d: "Grilled Turkey Combo (with yam, plantain, potatoes, sausage & corn)", p: 6500, c: "Grill House" },
-          // PRICE CHANGED: was 4500 -> now 6000
           { n: "Grilled Chicken Combo", d: "Grilled Chicken Combo (with yam, plantain, potatoes, sausage & corn)", p: 6000, c: "Grill House" },
-          // PRICE CHANGED: was 4500 -> now 5500
-          { n: "Sweet Chilli Chicken Wings Combo", d: "Sweet Chilli Chicken Wings Combo (with sides)", p: 5500, c: "Grill House" },
-          // PRICE CHANGED: was 4500 -> now 5500
-          { n: "Chicken Skewers Combo", d: "Chicken Skewers Combo (with sides)", p: 5500, c: "Grill House" },
-          // PRICE CHANGED: was 4000 -> now 5000
-          { n: "Spicy Gizzard Kebab Combo", d: "Spicy Gizzard Kebab Combo (with sides)", p: 5000, c: "Grill House" },
+          { n: "Sweet Chilli Chicken Wings Combo", d: "Sweet Chilli Chicken Wings Combo (with yam, plantain, potatoes, sausage & corn)", p: 5500, c: "Grill House" },
+          { n: "Chicken Skewers Combo", d: "Chicken Skewers Combo (with yam, plantain, potatoes, sausage & corn)", p: 5500, c: "Grill House" },
+          { n: "Spicy Gizzard Kebab Combo", d: "Spicy Gizzard Kebab Combo (with yam, plantain, potatoes, sausage & corn)", p: 5000, c: "Grill House" },
           { n: "Spicy Jumbo Snail Combo", d: "Spicy Jumbo Snail Combo (with sides)", p: 7000, c: "Grill House" },
-          // PRICE CHANGED: was 7500 -> now 8500
           { n: "Jumbo Grilled Prawn Combo (Medium)", d: "Jumbo Grilled Prawn Combo (Medium)", p: 8500, c: "Grill House" },
-          // PRICE CHANGED: was 9000 -> now 10000
           { n: "Jumbo Grilled Prawn Combo (Large)", d: "Jumbo Grilled Prawn Combo (Large)", p: 10000, c: "Grill House" },
           { n: "Grill Bowl", d: "Grill Bowl (Prawns, fish cutlet, turkey, chicken, suya, yam fries, kebab, corn)", p: 15000, c: "Grill House" },
 
@@ -437,13 +421,11 @@
           { n: "Gourmet Hotdog", d: "Gourmet Hotdog", p: 4500, c: "After Party" },
           { n: "Fries", d: "Fries", p: 2000, c: "After Party" },
 
-          /* AFTER PARTY - Combos & Platters / Misc */
+          /* AFTER PARTY - Combos & Misc */
           { n: "Mini Burger/Hotdog Combos", d: "Mini Burger/Hotdog Combos (with fries & wings/kebab)", p: 7500, c: "After Party" },
           { n: "Gizdodo", d: "Gizdodo", p: 2500, c: "After Party" },
           { n: "Puffy Cups & Chicken Wings", d: "Puffy Cups & Chicken Wings", p: 2500, c: "After Party" },
-          // PRICE CHANGED: was 2000 -> now 2500
           { n: "Dundun & Dodo", d: "Dundun & Dodo (with Pomo or Shawa Sauce)", p: 2500, c: "After Party" },
-          // PRICE CHANGED: was 120000 -> now 150000
           { n: "Asun (Whole Goat)", d: "Asun (Whole Goat - feeds 40-45)", p: 150000, c: "After Party" },
           { n: "Tapioca (Plain)", d: "Tapioca (Plain)", p: 2500, c: "After Party" },
           { n: "Tapioca with Fish/Prawn/Akara", d: "Tapioca with Fish/Prawn/Akara", p: 5000, c: "After Party" },
@@ -454,17 +436,13 @@
           { n: "Chow Platter", d: "Chow Platter (5 Springrolls, 5 Samosas, 5 BBQ Chicken, 20 Puff Puff, 15 Mosas, 5 Gizzards)", p: 25000, c: "Platter" },
           { n: "Nibbles Platter", d: "Nibbles Platter (10 Springrolls, 10 Samosas, 10 BBQ Chicken, 10 Prawns, 20 Puff Puff, 15 Mosas)", p: 30000, c: "Platter" },
           { n: "Yummy Platter", d: "Yummy Platter (2 Sliders, 2 Mini Shawarma, 4 Honey BBQ Wings, 4 Spicy Wings, 4 Coconut Prawns, 4 Corn, 25 Puff Puff, 20 Mosas)", p: 50000, c: "Platter" },
-          // PRICE CHANGED: was 50000 -> now 60000
           { n: "Treaty Platter", d: "Treaty Platter (4 Prawn Mayonnaise Springrolls, 4 Moneybags, 4 Sweet Chilli Wings, 4 Battered Fish, 4 Potato Balls, 4 Gizzards, 4 Corndogs, 25 Puff Puff, 20 Mosas)", p: 60000, c: "Platter" },
           { n: "Lockdown Platter", d: "Lockdown Platter (5 Springrolls, 5 Prawn Springrolls, 5 Samosas, 5 Moneybags, 5 BBQ Chicken, 5 Sweet Chilli Wings, 5 Gizzards, 5 Spicy Snails, 35 Puff Puff, 30 Mosas)", p: 62000, c: "Platter" },
           { n: "Delish Platter", d: "Delish Platter (Items follow standard section pricing)", p: 65000, c: "Platter" },
           { n: "Protein Platter", d: "Protein Platter (2 Prawns, 2 Turkey, 2 Crispy Chicken, 2 Fish Cutlets, 2 Corn, 2 Snails, Dundun & Dodo)", p: 80000, c: "Platter" },
-          // PRICE CHANGED: was 80000 -> now 100000
           { n: "Chicmeat Platter", d: "Chicmeat Platter (10 Chicken Kebabs, 10 Turkey/Cutlets, 15 Meatballs, 10 BBQ Wings, 10 Chicken Lollipops, 10 Corn)", p: 100000, c: "Platter" },
           { n: "Planners Platter", d: "Planners Platter (2 Prawns, 4 Moneybags, 2 Snails, 4 Samosas, 2 Mini Shawarma, 6 Puffy Kebabs, 2 Chicken Kebabs, 2 Gizzard Kebabs, 4 Springrolls, 4 Prawn Springrolls, 2 Meatball Kebabs)", p: 90000, c: "Platter" },
-          // PRICE CHANGED: was 100000 -> now 110000
           { n: "Olori Box", d: "Olori Box (5 Prawn Springrolls, 5 Springrolls, 5 Moneybags, 10 Chicken Kebabs, 2 Meatball Kebabs, 5 Wings, 5 Corn, 2 Turkey, 2 Prawns, 2 Snails, 2 Mini Shawarma, 6 Puffy Kebab, 30 Mosas)", p: 110000, c: "Platter" },
-          // PRICE CHANGED: was 100000 -> now 150000
           { n: "Fantastique Box", d: "Fantastique Box (5 Prawn Springrolls, 5 Prawn Tempura, 10 Springrolls, 10 Samosas, 10 Moneybags, 20 Corndogs, 20 Wings, 20 BBQ Chicken, 20 Battered Fish, 20 Snails, 40 Puff Puff, 35 Mosas)", p: 150000, c: "Platter" },
           { n: "CDF Delight", d: "CDF Delight (15 Peppered Catfish/Croaker, 10 Turkey, 10 Wings, 5 Jumbo Prawns, 10 Stick Meats, 5 Jumbo Snails, 10 Corn)", p: 150000, c: "Platter" }
         ];
@@ -793,17 +771,20 @@
                     const displayName = n.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const displayDesc = (s[n].d || '').replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;border-radius:5px;margin-bottom:8px;flex-wrap:wrap;gap:10px;">
-                        <div style="flex:1;min-width:150px;"><strong style="font-weight:800;">${displayName}</strong></div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <label style="margin:0;font-size:11px;font-weight:800;">Price:</label>
-                            <input type="number" value="${s[n].p}" min="0" onchange="updatePrice('${safeName}', this.value)" style="width:100px;padding:5px;border:1px solid #dc2626;border-radius:4px;font-weight:800;">
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <label style="margin:0;font-size:11px;font-weight:800;">Qty:</label>
-                            <input type="number" value="${s[n].q}" min="1" onchange="updateQty('${safeName}', this.value)" style="width:60px;padding:5px;text-align:center;border:1px solid #dc2626;border-radius:4px;font-weight:800;">
-                        </div>
-                        <button onclick="removeItem('${safeName}');" style="background:#dc2626;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:800;"><i class="fas fa-trash"></i></button>
-                    </div>`;
+                <div style="flex:1;min-width:150px;">
+                    <strong style="font-weight:800;">${displayName}</strong>
+                    <div style="font-size:12px;color:#666;font-weight:700;margin-top:6px;">${displayDesc}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <label style="margin:0;font-size:11px;font-weight:800;">Price:</label>
+                    <input type="number" value="${s[n].p}" min="0" onchange="updatePrice('${safeName}', this.value)" style="width:100px;padding:5px;border:1px solid #dc2626;border-radius:4px;font-weight:800;">
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <label style="margin:0;font-size:11px;font-weight:800;">Qty:</label>
+                    <input type="number" value="${s[n].q}" min="1" onchange="updateQty('${safeName}', this.value)" style="width:60px;padding:5px;text-align:center;border:1px solid #dc2626;border-radius:4px;font-weight:800;">
+                </div>
+                <button onclick="removeItem('${safeName}');" style="background:#dc2626;color:#fff;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-weight:800;"><i class="fas fa-trash"></i></button>
+            </div>`;
                 }).join('');
             } catch (e) {
                 console.error('Render edit items error:', e);
@@ -868,6 +849,7 @@
                 const steps = document.querySelectorAll('[id^="step"]');
                 if (!steps.length) return;
                 
+                steps.forEach
                 steps.forEach(el => {
                     el.classList.remove('active', 'completed');
                 });
@@ -953,7 +935,7 @@
                 const discount = document.getElementById('discount')?.value || '0';
                 
                 // Sanitize and escape HTML for security
-                const escapeHtml = (str) => String(str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const escapeHtml = (str) => String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
                 const reviewEl = document.getElementById('review-event-details');
                 if (reviewEl) {
@@ -969,9 +951,14 @@
                     `;
                 }
 
+                // Use the item's description (s[n].d) as the display in the review and include qty & rate
                 const itemsHtml = Object.keys(s).map(n => {
                     if (!s[n] || typeof s[n].p !== 'number') return '';
-                    return `<p>${escapeHtml(n)} - Qty: ${s[n].q} - ₦${s[n].p.toLocaleString()}</p>`;
+                    const title = escapeHtml(n);
+                    const desc = escapeHtml(s[n].d || n);
+                    const qty = s[n].q;
+                    const rate = s[n].p.toLocaleString();
+                    return `<div style="margin-bottom:8px;"><strong style="font-weight:800;">${title}</strong><div style="font-size:13px;color:#666;margin-top:4px;">${desc}</div><div style="margin-top:6px;font-weight:800;">Qty: ${qty} • ₦${rate}</div></div>`;
                 }).join('');
                 
                 const itemsEl = document.getElementById('review-selected-items');
@@ -1156,7 +1143,7 @@
                             return '';
                         }
                         const tot = i.p * i.q;
-                        sub += tot;
+                                               sub += tot;
                         // Escape HTML in item description (use description from selected item)
                         const desc = (i.d || n);
                         const escapedDesc = desc.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
