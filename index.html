@@ -309,7 +309,6 @@
                 </div>
                 <div class="form-row">
                     <div><label>Account Name</label><input type="text" id="receipt-account-name" placeholder="Cuisine Fantastique" required></div>
-                    <div><label>Upload Signature</label><input type="file" id="receipt-signature-file" accept="image/*" onchange="handleReceiptSignature(event)"></div>
                 </div>
                 <div style="margin-top:10px;background:#f0fdf4;padding:12px;border-radius:8px;border:1px solid #bbf7d0;font-size:13px;line-height:1.6;">
                     <strong>Note:</strong> Only fill the bank name, account number and account name. Your invoice details will appear automatically from the current invoice.
@@ -608,7 +607,7 @@
             }
         }
         
-        let s = {}, f = 'All', serviceChargeRate = 15, currentStep = 1, passwordAction = '', receiptSignatureData = '';
+        let s = {}, f = 'All', serviceChargeRate = 15, currentStep = 1, passwordAction = '';
 
         function init() {
             try {
@@ -1588,8 +1587,6 @@
                 document.getElementById('receipt-bank-name').value = 'UBA';
                 document.getElementById('receipt-account-number').value = '2094187584';
                 document.getElementById('receipt-account-name').value = 'Cuisine Fantastique';
-                document.getElementById('receipt-signature-file').value = '';
-                receiptSignatureData = '';
                 document.getElementById('receipt-modal').style.display = 'flex';
             } catch (e) {
                 console.error('Open receipt form error:', e);
@@ -1599,24 +1596,6 @@
 
         function closeReceiptModal() {
             document.getElementById('receipt-modal').style.display = 'none';
-        }
-
-        function handleReceiptSignature(event) {
-            try {
-                const file = event.target.files && event.target.files[0];
-                if (!file) {
-                    receiptSignatureData = '';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    receiptSignatureData = e.target.result || '';
-                };
-                reader.readAsDataURL(file);
-            } catch (e) {
-                console.error('Signature upload error:', e);
-                alert('Error loading signature image');
-            }
         }
 
         function createPaymentReceipt() {
@@ -1668,9 +1647,7 @@
                     return `<tr class="no-break" style="background:#ecfdf5;color:#166534;font-weight:800;"><td>${description}</td><td style="text-align:right;">${formatCurrency(item.p)}</td><td style="text-align:center;">${item.q}</td><td style="text-align:right;">${formatCurrency(itemTotal)}</td><td style="text-align:center;color:#16a34a;font-size:16px;">✅</td></tr>`;
                 }).join('');
 
-                const signatureHtml = receiptSignatureData
-                    ? `<img src="${receiptSignatureData}" alt="Signature" style="max-width:240px;margin-top:16px;border:1px solid #d1fae5;border-radius:8px;">`
-                    : `<div style="margin:24px auto 0;width:260px;height:80px;border-bottom:2px solid #16a34a;"></div><div style="margin-top:8px;font-size:12px;color:#4b5563;">Authorized Signature</div>`;
+                const signatureHtml = '';
 
                 document.getElementById('receipt-to-print').innerHTML = `
                     <div style="padding:30px 25px;">
@@ -1691,9 +1668,6 @@
                                 <p style="margin:0;">Amount Received: ${amountReceived}</p>
                             </div>
                             <p>The payment has been confirmed and your event will be supported with a professional service delivery from Cuisine Fantastique.</p>
-                        </div>
-                        <div style="margin-top:42px;text-align:center;">
-                            ${signatureHtml}
                         </div>
                     </div>
                     <div style="page-break-before:always;break-before:page;page-break-after:always;break-after:page;padding:30px 25px;">
