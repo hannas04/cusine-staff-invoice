@@ -493,7 +493,7 @@
                             console.warn(`Storage quota nearly full: ${percentUsed.toFixed(1)}% used`);
                             // Auto-cleanup old invoices if over 80%
                             if (percentUsed > 80) {
-                                cleanupOldInvoices();
+                                cleanupCorruptedInvoices();
                             }
                         }
                     }).catch(err => console.error('Storage estimate error:', err));
@@ -503,19 +503,14 @@
             }
         }
 
-        function cleanupOldInvoices() {
+        function cleanupCorruptedInvoices() {
             try {
-                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
                 const keys = Object.keys(localStorage).filter(k => k && k.startsWith('INV-'));
                 let cleaned = 0;
                 
                 keys.forEach(key => {
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
-                        if (Date.now() - (data?.timestamp || 0) > THIRTY_DAYS_MS) {
-                            localStorage.removeItem(key);
-                            cleaned++;
-                        }
                     } catch (e) {
                         // Remove corrupted entries
                         localStorage.removeItem(key);
@@ -524,7 +519,7 @@
                 });
                 
                 if (cleaned > 0) {
-                    console.log(`Cleaned up ${cleaned} expired invoices`);
+                    console.log(`Cleaned up ${cleaned} corrupted invoices`);
                 }
             } catch (e) {
                 console.error('Cleanup error:', e);
@@ -1029,11 +1024,6 @@
                 if (!data || !data.client) {
                     alert("Invalid invoice data structure");
                     return;
-                }
-
-                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-                if (Date.now() - (data.timestamp || 0) > THIRTY_DAYS_MS) {
-                    alert("This invoice has expired (older than 30 days). Creating new invoice from data.");
                 }
 
                 // Safely set all form fields with fallbacks
@@ -1838,8 +1828,6 @@
                 }
                 
                 list.innerHTML = '';
-                const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-                
                 const keys = Object.keys(localStorage)
                     .filter(key => key && key.startsWith('INV-'))
                     .sort((a, b) => {
@@ -1856,12 +1844,6 @@
                     try {
                         const data = JSON.parse(localStorage.getItem(key));
                         if (!data || !data.client) return;
-                        
-                        // Check 30-day expiration
-                        if (Date.now() - (data.timestamp || 0) > THIRTY_DAYS_MS) {
-                            localStorage.removeItem(key); // Clean up expired invoices
-                            return;
-                        }
                         
                         // Calculate totals safely
                         const items = data.items || {};
