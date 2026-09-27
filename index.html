@@ -844,8 +844,8 @@
             try {
                 if (!n || !s[n]) return;
                 const qty = parseInt(q, 10); // Specify radix for safety
-                if (isNaN(qty) || qty < 1 || qty > 999) { 
-                    alert('Quantity must be between 1 and 999'); 
+                if (isNaN(qty) || qty < 1) { 
+                    alert('Quantity must be at least 1'); 
                     return; 
                 }
                 s[n].q = qty;

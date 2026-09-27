@@ -56,7 +56,7 @@ Added comprehensive error handling to:
 
 **Item Management**:
 - updatePrice() - Range validation with feedback
-- updateQty() - Quantity constraints (1-999)
+- updateQty() - Quantity constraint (minimum 1, no upper limit)
 - removeItem() - Safe deletion with UI refresh
 
 **Invoice Operations**:

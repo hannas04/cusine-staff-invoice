@@ -68,7 +68,7 @@
 
 **Item Management** (3):
 11. ✅ updatePrice() - Range validation (0-999,999,999)
-12. ✅ updateQty() - Quantity validation (1-999)
+12. ✅ updateQty() - Quantity validation (minimum 1, no upper limit)
 13. ✅ removeItem() - Safe deletion
 
 **Invoice Operations** (7):

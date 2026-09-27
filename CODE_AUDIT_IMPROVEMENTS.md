@@ -37,7 +37,7 @@ Comprehensive code audit and improvements for long-term reliability, security, a
 3. **renderSelectedItems()** - Safe DOM manipulation with element checks
 4. **renderEditItems()** - Type validation for item prices/quantities
 5. **updatePrice()** - Range validation with user-friendly errors
-6. **updateQty()** - Validates 1-999 range with feedback
+6. **updateQty()** - Validates a minimum quantity of 1 with feedback
 7. **removeItem()** - Safe deletion with UI refresh
 8. **generateInvoice()** - Comprehensive invoice generation with validation
 9. **retrieveInvoice()** - Safe data restoration with corruption detection

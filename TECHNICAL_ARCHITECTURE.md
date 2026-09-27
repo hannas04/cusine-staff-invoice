@@ -55,7 +55,7 @@ s = {
 ```
 **Structure**: Global object `s`
 **Price**: Stored as float, validated 0-999,999,999
-**Quantity**: Integer 1-999
+**Quantity**: Integer, minimum 1 with no upper limit
 **Usage**: Passed through form steps, stored in localStorage
 
 ### Invoice Object
@@ -117,7 +117,7 @@ balance = 11112.5;              // balance due
 
 ### Item Management
 1. **updatePrice(name, newPrice)** - Changes item price (0-999,999,999)
-2. **updateQty(name, newQty)** - Changes item quantity (1-999)
+2. **updateQty(name, newQty)** - Changes item quantity (minimum 1, no upper limit)
 3. **removeItem(name)** - Deletes item from selection
 
 ### Invoice Operations
@@ -395,7 +395,7 @@ try {
 
 // Input validation
 - Price range validation (0-999,999,999)
-- Quantity range validation (1-999)
+- Quantity validation (minimum 1, no upper limit)
 - Email format validation
 - Required field validation
 

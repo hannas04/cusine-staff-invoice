@@ -69,7 +69,7 @@ The menu search now uses debouncing with 300ms delay. This means:
 
 **Constraints**:
 - Price: 0 to 999,999,999 per item
-- Quantity: 1 to 999 items
+- Quantity: 1 or more items
 
 ### Step 4: Review
 - Double-check all details
