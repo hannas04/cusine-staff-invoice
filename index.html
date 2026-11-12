@@ -1533,6 +1533,31 @@
             }
         }
 
+        async function savePdf(el, opt, filename) {
+            const blob = await html2pdf().set(opt).from(el)
+                .toPdf().get('pdf').then(pdf => pdf.output('blob'));
+            const file = new File([blob], filename, { type: 'application/pdf' });
+
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            if (isAndroid && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({ files: [file], title: filename });
+                    return;
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                }
+            }
+
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }
+
         function generatePDF() {
             try {
                 const el = document.getElementById('invoice-to-print');
@@ -1557,7 +1582,7 @@
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak: { mode: ['css', 'legacy'] }
                 };
-                html2pdf().set(opt).from(el).save().catch(err => {
+                savePdf(el, opt, filename).catch(err => {
                     console.error('Invoice PDF generation error:', err);
                     alert('PDF generation failed: ' + (err.message || 'Unknown error'));
                 });
@@ -1721,7 +1746,7 @@
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak: { mode: ['css', 'legacy'] }
                 };
-                html2pdf().set(opt).from(el).save().catch(err => {
+                savePdf(el, opt, filename).catch(err => {
                     console.error('Receipt PDF generation error:', err);
                     alert('PDF generation failed: ' + (err.message || 'Unknown error'));
                 });
